@@ -1,3 +1,5 @@
+using InventoryManagement.Application.Mapping;
+using InventoryManagement.Application.Services;
 using InventoryManagement.Infrastructure;
 using InventoryManagement.Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +12,14 @@ builder.Services.AddControllers();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); 
 builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(connectionString));
-builder.Services.AddUnitOfWorkAndRepository(); 
+builder.Services.AddUnitOfWorkAndRepository();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<MappingProfile>();       
+});
+
+builder.Services.AddScoped<CategoryService, CategoryService>(); 
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

@@ -1,6 +1,11 @@
 @InventoryManagement.API_HostAddress = http://localhost:5079
 
-GET {{InventoryManagement.API_HostAddress}}/weatherforecast/
+GET {{InventoryManagement.API_HostAddress}}/api/Categories/1
 Accept: application/json
 
 ###
+POST {{InventoryManagement.API_HostAddress}}/api/Categories
+Content-Type: application/json
+{
+  "name" :"Books"
+}

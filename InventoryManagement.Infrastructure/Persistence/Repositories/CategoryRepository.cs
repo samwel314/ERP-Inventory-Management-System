@@ -15,7 +15,7 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
         {
             _db = db;
         }
-        public async Task Create(Category category)
+        public async Task CreateAsync(Category category)
         {
             await _db.Categories.AddAsync(category);       
         }
