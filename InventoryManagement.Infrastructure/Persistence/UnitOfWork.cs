@@ -1,0 +1,20 @@
+﻿namespace InventoryManagement.Infrastructure.Persistence
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly ApplicationDbContext _db;
+
+        public UnitOfWork(ApplicationDbContext db  , ICategoryRepository  category)
+        {
+            _db = db;
+            Categories = category;      
+        }
+
+        public ICategoryRepository Categories {  get; private set;}
+
+        public async Task SaveChangesAsync()
+        {
+           await _db.SaveChangesAsync();     
+        }
+    }
+}

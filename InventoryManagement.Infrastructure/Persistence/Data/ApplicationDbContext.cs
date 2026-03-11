@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace InventoryManagement.Infrastructure.Data
+namespace InventoryManagement.Infrastructure.Persistence.Data
 {
     public class ApplicationDbContext : DbContext 
     {
