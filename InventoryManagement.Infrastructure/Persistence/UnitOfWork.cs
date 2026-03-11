@@ -1,4 +1,8 @@
-﻿namespace InventoryManagement.Infrastructure.Persistence
+﻿using InventoryManagement.Application.Persistence;
+using InventoryManagement.Application.Persistence.Repositories;
+using InventoryManagement.Infrastructure.Persistence.Data;
+
+namespace InventoryManagement.Infrastructure.Persistence
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -10,7 +14,7 @@
             Categories = category;      
         }
 
-        public ICategoryRepository Categories {  get; private set;}
+        public ICategoryRepository Categories { get;  }
 
         public async Task SaveChangesAsync()
         {
