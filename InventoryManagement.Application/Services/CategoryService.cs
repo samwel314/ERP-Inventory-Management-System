@@ -69,6 +69,7 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<string>> DeleteCategoryAsync(int Id)
         {
+            //check if it have products 
            var category = await _db.Categories.GetByIdAsync(Id);
             if (category == null)
                 return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
@@ -76,7 +77,24 @@ namespace InventoryManagement.Application.Services
            await _db.SaveChangesAsync(); 
             return Result<string>.Success("Category Deleted Successfully");
         }
-
+        public async Task<Result<string>> ActiveCategoryAsync(int Id)
+        {
+            var category = await _db.Categories.GetByIdAsync(Id , true);
+            if (category == null)
+                return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
+            category.Activate();    
+            await _db.SaveChangesAsync();
+            return Result<string>.Success("Category Activated Successfully");
+        }
+        public async Task<Result<string>> DeActiveCategoryAsync(int Id)
+        {
+            var category = await _db.Categories.GetByIdAsync(Id, true);
+            if (category == null)
+                return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
+            category.Deactivate();
+            await _db.SaveChangesAsync();
+            return Result<string>.Success("Category DeActivated Successfully");
+        }
     }
 }
 

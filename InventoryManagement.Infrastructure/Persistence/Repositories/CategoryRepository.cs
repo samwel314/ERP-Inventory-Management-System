@@ -31,14 +31,10 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
         {
             Category ? categoryFromDb; 
            if (track)
-                categoryFromDb = await _db.Categories.FindAsync(id);    
-           else
-                categoryFromDb = await _db.Categories.AsNoTracking().FirstOrDefaultAsync(c=> c.Id == id); 
+                categoryFromDb = await _db.Categories.IgnoreQueryFilters().FirstOrDefaultAsync(c => c.Id == id);
+            else
+                categoryFromDb = await _db.Categories.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(c=> c.Id == id); 
             return categoryFromDb ; 
-        }
-        public void Update(Category category)
-        {
-            _db.Categories.Update(category);        
         }
     }
 }

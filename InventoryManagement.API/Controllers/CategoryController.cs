@@ -28,9 +28,9 @@ namespace InventoryManagement.API.Controllers
             } , result.Data); 
         }
         [HttpGet ("{Id}" , Name = "GetById")] 
-        public IActionResult GetCategory (int Id)
+        public async Task<IActionResult> GetCategory (int Id)
         {
-            var result =  _service.GetByIdAsync(Id).Result;
+            var result =  await _service.GetByIdAsync(Id);
             if (!result.IsSuccess)
                 return NotFound(result.ErrorMessage);
             return Ok(result.Data);
@@ -62,13 +62,25 @@ namespace InventoryManagement.API.Controllers
         {
             var result = await _service.DeleteCategoryAsync(Id);
             if (!result.IsSuccess)
-                return NotFound(result.ErrorMessage);
+                return NotFound(new { message =  result.ErrorMessage });
             return NoContent(); ;
         }
+        [HttpPut("{Id}/activate")]
+        public async Task<IActionResult> ActiveCategory(int Id)
+        {
+            var result = await _service.ActiveCategoryAsync(Id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return NoContent(); ;
+        }
+        [HttpPut("{Id}/deactivate")]
+        public async Task<IActionResult> DeActiveCategory(int Id)
+        {
+            var result = await _service.DeActiveCategoryAsync(Id);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return NoContent(); ;
+        }
+
     }
 }
-
-
-
-
-

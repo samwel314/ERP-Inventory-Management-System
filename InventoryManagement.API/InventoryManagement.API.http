@@ -18,3 +18,11 @@ Content-Type: application/json
 ###
 Delete {{InventoryManagement.API_HostAddress}}/api/Categories/2
 Content-Type: application/json
+
+###
+PUT {{InventoryManagement.API_HostAddress}}/api/Categories/3/activate
+Content-Type: application/json
+
+###
+PUT {{InventoryManagement.API_HostAddress}}/api/Categories/3/deactivate
+Content-Type: application/json
