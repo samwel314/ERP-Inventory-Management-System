@@ -15,3 +15,6 @@ Content-Type: application/json
 {
   "name" :"Books days"
 }
+###
+Delete {{InventoryManagement.API_HostAddress}}/api/Categories/2
+Content-Type: application/json

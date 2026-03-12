@@ -3,6 +3,7 @@ using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace InventoryManagement.API.Controllers
 {
@@ -56,5 +57,18 @@ namespace InventoryManagement.API.Controllers
             }
             return NoContent(); 
         }
+        [HttpDelete ("{Id}")]
+        public  async Task<IActionResult> DeleteCategory(int Id)
+        {
+            var result = await _service.DeleteCategoryAsync(Id);
+            if (!result.IsSuccess)
+                return NotFound(result.ErrorMessage);
+            return NoContent(); ;
+        }
     }
 }
+
+
+
+
+

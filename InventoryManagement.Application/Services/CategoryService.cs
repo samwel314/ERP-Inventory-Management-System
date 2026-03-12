@@ -67,7 +67,15 @@ namespace InventoryManagement.Application.Services
             }
             return Result<string>.Success($"Category Updated Successfully"); 
         }
-
+        public async Task<Result<string>> DeleteCategoryAsync(int Id)
+        {
+           var category = await _db.Categories.GetByIdAsync(Id);
+            if (category == null)
+                return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
+            _db.Categories.Delete(category);
+           await _db.SaveChangesAsync(); 
+            return Result<string>.Success("Category Deleted Successfully");
+        }
 
     }
 }
