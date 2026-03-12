@@ -27,10 +27,14 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
         {
             return _db.Categories.AsNoTracking();   
         }
-        public async Task<Category?> GetByIdAsync(int id)
+        public async Task<Category?> GetByIdAsync(int id , bool track = false)
         {
-           var categoryFromDb = await _db.Categories.FindAsync(id);
-            return categoryFromDb; 
+            Category ? categoryFromDb; 
+           if (track)
+                categoryFromDb = await _db.Categories.FindAsync(id);    
+           else
+                categoryFromDb = await _db.Categories.AsNoTracking().FirstOrDefaultAsync(c=> c.Id == id); 
+            return categoryFromDb ; 
         }
         public void Update(Category category)
         {

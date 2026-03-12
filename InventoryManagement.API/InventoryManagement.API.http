@@ -9,3 +9,9 @@ Content-Type: application/json
 {
   "name" :"Books"
 }
+###
+PUT {{InventoryManagement.API_HostAddress}}/api/Categories/2
+Content-Type: application/json
+{
+  "name" :"Books days"
+}

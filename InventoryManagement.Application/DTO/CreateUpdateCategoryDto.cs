@@ -5,7 +5,7 @@ using System.Text;
 
 namespace InventoryManagement.Application.DTO
 {
-    public class CreateCategoryDto
+    public class CreateUpdateCategoryDto
     {
         [MaxLength (100 , ErrorMessage = "Name must be less than 100 characters") ]
         [Required (ErrorMessage = "Name is required")]

@@ -1,4 +1,5 @@
 ﻿using InventoryManagement.Application.DTO;
+using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace InventoryManagement.API.Controllers
             _service = service;
         }
         [HttpPost] 
-        public async Task<IActionResult> Create(CreateCategoryDto dto )
+        public async Task<IActionResult> Create(CreateUpdateCategoryDto dto )
         {
             var result = await _service.CreateCategoryAsync(dto); 
             if (!result.IsSuccess)
@@ -32,6 +33,28 @@ namespace InventoryManagement.API.Controllers
             if (!result.IsSuccess)
                 return NotFound(result.ErrorMessage);
             return Ok(result.Data);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCategories (int page = 1   , int pageSize = 5 )
+        {
+            var result =await _service.GetCategoriesAsync(page, pageSize); 
+            return Ok(result.Data);     
+        }
+        [HttpPut ("{Id}")]
+        public async Task<IActionResult> UpdateCategory(int Id , CreateUpdateCategoryDto Model )
+        {
+           var result =  await _service.UpdateCategoryAsync(Id, Model);
+            if (!result.IsSuccess)
+            {
+                switch (result.ErrorType)
+                {
+                    case ErrorType.NotFound: return NotFound(new {message = result.ErrorMessage});
+                    case ErrorType.Conflict: return Conflict(new {message = result.ErrorMessage});
+                    default:
+                        return BadRequest(result.ErrorMessage);
+                }
+            }
+            return NoContent(); 
         }
     }
 }

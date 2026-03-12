@@ -10,7 +10,6 @@ namespace InventoryManagement.Application.ResultHelpers
         public int Next { get;}
         public int Previous { get;}     
         public int TotalPages { get;}
-        public int Size { get; }    
         public int pageSize { get; } 
         public int pageNumber { get; }
         public Pagination(int totalCount , int pageSize , int pageNumber )

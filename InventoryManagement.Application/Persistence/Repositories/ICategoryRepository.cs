@@ -7,7 +7,7 @@ namespace InventoryManagement.Application.Persistence.Repositories
         Task CreateAsync(Category category);
         void  Update (Category category);    
         void Delete (Category category);     
-        Task <Category ? > GetByIdAsync (int id);    
+        Task <Category ? > GetByIdAsync (int id , bool track = false);    
         IQueryable<Category> GetAll ();    
     }
 }
