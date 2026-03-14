@@ -1,6 +1,6 @@
 @InventoryManagement.API_HostAddress = http://localhost:5079
 
-GET {{InventoryManagement.API_HostAddress}}/api/Categories/1
+GET {{InventoryManagement.API_HostAddress}}/api/Categories/
 Accept: application/json
 
 ###

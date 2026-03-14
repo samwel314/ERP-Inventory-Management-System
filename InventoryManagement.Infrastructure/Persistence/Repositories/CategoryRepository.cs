@@ -15,9 +15,9 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
         {
             _db = db;
         }
-        public async Task CreateAsync(Category category)
+        public async Task CreateAsync(Category category, CancellationToken ct =default)
         {
-            await _db.Categories.AddAsync(category);       
+            await _db.Categories.AddAsync(category, ct );       
         }
         public void Delete(Category category)
         {
@@ -27,13 +27,13 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
         {
             return _db.Categories.AsNoTracking();   
         }
-        public async Task<Category?> GetByIdAsync(int id , bool track = false)
+        public async Task<Category?> GetByIdAsync(int id , CancellationToken ct = default , bool track = false)
         {
             Category ? categoryFromDb; 
            if (track)
-                categoryFromDb = await _db.Categories.IgnoreQueryFilters().FirstOrDefaultAsync(c => c.Id == id);
+                categoryFromDb = await _db.Categories.IgnoreQueryFilters().FirstOrDefaultAsync(c => c.Id == id , ct);
             else
-                categoryFromDb = await _db.Categories.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(c=> c.Id == id); 
+                categoryFromDb = await _db.Categories.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(c=> c.Id == id , ct); 
             return categoryFromDb ; 
         }
     }

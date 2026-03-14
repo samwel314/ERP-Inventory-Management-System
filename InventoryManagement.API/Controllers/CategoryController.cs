@@ -17,9 +17,9 @@ namespace InventoryManagement.API.Controllers
             _service = service;
         }
         [HttpPost] 
-        public async Task<IActionResult> Create(CreateUpdateCategoryDto dto )
+        public async Task<IActionResult> Create(CreateUpdateCategoryDto dto , CancellationToken ct = default )
         {
-            var result = await _service.CreateCategoryAsync(dto); 
+            var result = await _service.CreateCategoryAsync(dto , ct); 
             if (!result.IsSuccess)
                 return Conflict(new { message =  result.ErrorMessage });
             return CreatedAtRoute(routeName: "GetById", routeValues: new
@@ -28,23 +28,23 @@ namespace InventoryManagement.API.Controllers
             } , result.Data); 
         }
         [HttpGet ("{Id}" , Name = "GetById")] 
-        public async Task<IActionResult> GetCategory (int Id)
+        public async Task<IActionResult> GetCategory (int Id, CancellationToken ct = default)
         {
-            var result =  await _service.GetByIdAsync(Id);
+            var result =  await _service.GetByIdAsync(Id, ct);
             if (!result.IsSuccess)
                 return NotFound(result.ErrorMessage);
             return Ok(result.Data);
         }
         [HttpGet]
-        public async Task<IActionResult> GetCategories (int page = 1   , int pageSize = 5 )
+        public async Task<IActionResult> GetCategories (int page = 1   , int pageSize = 5, CancellationToken ct = default)
         {
-            var result =await _service.GetCategoriesAsync(page, pageSize); 
+            var result =await _service.GetCategoriesAsync(page, pageSize , ct ); 
             return Ok(result.Data);     
         }
         [HttpPut ("{Id}")]
-        public async Task<IActionResult> UpdateCategory(int Id , CreateUpdateCategoryDto Model )
+        public async Task<IActionResult> UpdateCategory(int Id , CreateUpdateCategoryDto Model, CancellationToken ct = default)
         {
-           var result =  await _service.UpdateCategoryAsync(Id, Model);
+           var result =  await _service.UpdateCategoryAsync(Id, Model , ct);
             if (!result.IsSuccess)
             {
                 switch (result.ErrorType)
@@ -58,25 +58,25 @@ namespace InventoryManagement.API.Controllers
             return NoContent(); 
         }
         [HttpDelete ("{Id}")]
-        public  async Task<IActionResult> DeleteCategory(int Id)
+        public  async Task<IActionResult> DeleteCategory(int Id, CancellationToken ct = default)
         {
-            var result = await _service.DeleteCategoryAsync(Id);
+            var result = await _service.DeleteCategoryAsync(Id , ct);
             if (!result.IsSuccess)
                 return NotFound(new { message =  result.ErrorMessage });
             return NoContent(); ;
         }
         [HttpPut("{Id}/activate")]
-        public async Task<IActionResult> ActiveCategory(int Id)
+        public async Task<IActionResult> ActiveCategory(int Id, CancellationToken ct = default)
         {
-            var result = await _service.ActiveCategoryAsync(Id);
+            var result = await _service.ActiveCategoryAsync(Id , ct);
             if (!result.IsSuccess)
                 return NotFound(new { message = result.ErrorMessage });
             return NoContent(); ;
         }
         [HttpPut("{Id}/deactivate")]
-        public async Task<IActionResult> DeActiveCategory(int Id)
+        public async Task<IActionResult> DeActiveCategory(int Id, CancellationToken ct = default)
         {
-            var result = await _service.DeActiveCategoryAsync(Id);
+            var result = await _service.DeActiveCategoryAsync(Id, ct);
             if (!result.IsSuccess)
                 return NotFound(new { message = result.ErrorMessage });
             return NoContent(); ;
