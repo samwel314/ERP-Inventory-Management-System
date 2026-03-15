@@ -18,9 +18,8 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
         {
             base.OnModelCreating(modelBuilder);
             // -*-*-*-* Category
-            modelBuilder.Entity<Category>().Property(c => c.Name).HasMaxLength(100);
-            modelBuilder.Entity<Category>().HasQueryFilter(c => c.IsActive);
-            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne().HasForeignKey(p => p.CategoryId);
+            modelBuilder.Entity<Category>().Property(c => c.Name).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne(p=>p.Category).HasForeignKey(p => p.CategoryId);
             //- *-*-*-* Product 
             modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<Product>().Property(p => p.Description).HasMaxLength(1000);
@@ -34,8 +33,8 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
                 t.HasCheckConstraint("CK_Product_SellingPrice_GreaterThanZero", "[SellingPrice] > 0 ");
                 t.HasCheckConstraint("CK_Product_PurchasePrice_GreaterThanZero", "[PurchasePrice] > 0 ");
             });
-            modelBuilder.Entity<Product>().Property(p => p.SellingPrice).IsRequired();
-            modelBuilder.Entity<Product>().Property(p => p.PurchasePrice).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.SellingPrice).IsRequired().HasPrecision(18, 2);
+            modelBuilder.Entity<Product>().Property(p => p.PurchasePrice).IsRequired().HasPrecision(18 , 2);
             modelBuilder.Entity<Product>().Property(p => p.ImageUrl).IsRequired();
         }
     }
