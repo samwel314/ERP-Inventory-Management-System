@@ -44,5 +44,7 @@ namespace InventoryManagement.Domain.Entities
             Name = name;
             UpdatedAt = DateTime.UtcNow;
         }
+        // nav 
+        public IEnumerable<Product> Products { get; private set; } = null!;
     }
 }

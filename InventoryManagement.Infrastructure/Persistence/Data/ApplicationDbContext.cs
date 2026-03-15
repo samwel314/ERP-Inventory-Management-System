@@ -6,18 +6,37 @@ using System.Text;
 
 namespace InventoryManagement.Infrastructure.Persistence.Data
 {
-    public class ApplicationDbContext : DbContext 
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
-            
+
         }
-        public DbSet<Category> Categories  { get; set; }   
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Category> ().Property(c=> c.Name).HasMaxLength(100);
-            modelBuilder.Entity<Category>().HasQueryFilter(c => c.IsActive); 
+            // -*-*-*-* Category
+            modelBuilder.Entity<Category>().Property(c => c.Name).HasMaxLength(100);
+            modelBuilder.Entity<Category>().HasQueryFilter(c => c.IsActive);
+            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne().HasForeignKey(p => p.CategoryId);
+            //- *-*-*-* Product 
+            modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<Product>().Property(p => p.Description).HasMaxLength(1000);
+            modelBuilder.Entity<Product>().Property(p => p.SKU).IsRequired().HasMaxLength(100);
+
+            modelBuilder.Entity<Product>().HasIndex(p => p.SKU).IsUnique();
+            modelBuilder.Entity<Product>().Property(p => p.MinimumStock).IsRequired();
+            modelBuilder.Entity<Product>().ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_Product_MinimumStock_GreaterThanZero", "[MinimumStock] >= 0 ");
+                t.HasCheckConstraint("CK_Product_SellingPrice_GreaterThanZero", "[SellingPrice] > 0 ");
+                t.HasCheckConstraint("CK_Product_PurchasePrice_GreaterThanZero", "[PurchasePrice] > 0 ");
+            });
+            modelBuilder.Entity<Product>().Property(p => p.SellingPrice).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.PurchasePrice).IsRequired();
+            modelBuilder.Entity<Product>().Property(p => p.ImageUrl).IsRequired();
         }
     }
 }

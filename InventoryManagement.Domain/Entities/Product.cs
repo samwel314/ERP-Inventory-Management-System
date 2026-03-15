@@ -4,7 +4,7 @@
     {
         public Guid Id { get; private set; }
         public string Name { get; private set; } = null!;
-        public string? Description { get; private set; } 
+        public string? Description { get; private set; }
         public string SKU { get; private set; } = null!;
         public int MinimumStock { get; private set; }
         public decimal SellingPrice { get; private set; }
@@ -17,15 +17,19 @@
         // nav
         public Category Category { get; private set; } = null!;
         // behavior 
-        public Product(string Name, string SKU, decimal SellingPrice, decimal PurchasePrice, int MinimumStock, string ImageUrl, int CategoryId, string ?Description = null)
+        Product()
+        {
+
+        }
+        public Product(string Name, string SKU, decimal SellingPrice, decimal PurchasePrice, int MinimumStock, string ImageUrl, int CategoryId, string? Description = null)
         {
             ValidateName(Name);
-            ValidateSKU(SKU); 
+            ValidateSKU(SKU);
             ValidateSellingPrice(SellingPrice);
             ValidatePurchasePrice(PurchasePrice);
             ValidateMinimumStock(MinimumStock);
             ValidateImageUrl(ImageUrl);
-            Id = Guid.NewGuid();    
+            Id = Guid.NewGuid();
             this.Name = Name;
             this.SKU = SKU;
             this.SellingPrice = SellingPrice;
@@ -63,12 +67,12 @@
             if (string.IsNullOrWhiteSpace(url))
                 throw new ArgumentException("ImageUrl is required");
         }
-        void ValidateSellingPrice(decimal sellingPrice)
+        private void ValidateSellingPrice(decimal sellingPrice)
         {
             if (sellingPrice <= 0)
                 throw new ArgumentException("sellingPrice must be greater than zero ");
         }
-        void ValidatePurchasePrice(decimal purchasePrice)
+        private void ValidatePurchasePrice(decimal purchasePrice)
         {
             if (purchasePrice <= 0)
                 throw new ArgumentException("purchasePrice must be greater than zero ");
@@ -81,8 +85,7 @@
         }
         public void UpdatePurchasePrice(decimal purchasePrice)
         {
-            if (purchasePrice <= 0)
-                throw new ArgumentException("purchasePrice must be greater than zero ");
+            ValidatePurchasePrice(purchasePrice);
             PurchasePrice = purchasePrice;
             UpdatedAt = DateTime.UtcNow;
         }
