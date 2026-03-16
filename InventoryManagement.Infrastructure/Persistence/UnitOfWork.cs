@@ -8,13 +8,15 @@ namespace InventoryManagement.Infrastructure.Persistence
     {
         private readonly ApplicationDbContext _db;
 
-        public UnitOfWork(ApplicationDbContext db  , ICategoryRepository  category)
+        public UnitOfWork(ApplicationDbContext db  , ICategoryRepository  category , IProductRepository product)
         {
             _db = db;
             Categories = category;      
+            Products = product;     
         }
 
         public ICategoryRepository Categories { get;  }
+        public IProductRepository Products { get; }
 
         public async Task SaveChangesAsync()
         {

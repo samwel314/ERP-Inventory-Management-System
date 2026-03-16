@@ -22,7 +22,8 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<MappingProfile>();       
 });
 
-builder.Services.AddScoped<CategoryService, CategoryService>(); 
+builder.Services.AddScoped<CategoryService, CategoryService>();
+builder.Services.AddScoped<ProductService, ProductService>(); 
 builder.Services.AddOpenApi();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>(); 
@@ -33,6 +34,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+app.UseStaticFiles(); 
 app.UseRouting();       
 app.UseHttpsRedirection();
 
