@@ -1,5 +1,8 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using InventoryManagement.Application.Mapping;
 using InventoryManagement.Application.Services;
+using InventoryManagement.Application.Validations;
 using InventoryManagement.Infrastructure;
 using InventoryManagement.Infrastructure.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +24,8 @@ builder.Services.AddAutoMapper(cfg =>
 
 builder.Services.AddScoped<CategoryService, CategoryService>(); 
 builder.Services.AddOpenApi();
-
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>(); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
