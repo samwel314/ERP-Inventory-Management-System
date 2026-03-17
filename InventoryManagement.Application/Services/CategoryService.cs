@@ -29,7 +29,7 @@ namespace InventoryManagement.Application.Services
                 return Result<CategoryDTO>.Failure("Category name already exists." , ErrorType.Conflict);
             var category = new Category(model.Name.ToLower());
             await _db.Categories.CreateAsync(category , ct );
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
             return Result<CategoryDTO>.Success(_mapper.Map<CategoryDTO>(category));
         }
 
@@ -63,7 +63,7 @@ namespace InventoryManagement.Application.Services
                 if (exist)
                     return Result<string>.Failure("Category name already exists." , ErrorType.Conflict);
                 category.UpdateName(model.Name); 
-                await _db.SaveChangesAsync();     
+                await _db.SaveChangesAsync(ct);     
             }
             return Result<string>.Success($"Category Updated Successfully"); 
         }
@@ -74,7 +74,7 @@ namespace InventoryManagement.Application.Services
             if (category == null)
                 return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
             _db.Categories.Delete(category);
-           await _db.SaveChangesAsync(); 
+           await _db.SaveChangesAsync(ct); 
             return Result<string>.Success("Category Deleted Successfully");
         }
         public async Task<Result<string>> ActiveCategoryAsync(int Id , CancellationToken ct = default )
@@ -83,7 +83,7 @@ namespace InventoryManagement.Application.Services
             if (category == null)
                 return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
             category.Activate();    
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
             return Result<string>.Success("Category Activated Successfully");
         }
         public async Task<Result<string>> DeActiveCategoryAsync(int Id , CancellationToken ct = default)
@@ -92,7 +92,7 @@ namespace InventoryManagement.Application.Services
             if (category == null)
                 return Result<string>.Failure("This Category not Found", ErrorType.NotFound);
             category.Deactivate();
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
             return Result<string>.Success("Category DeActivated Successfully");
         }
     }

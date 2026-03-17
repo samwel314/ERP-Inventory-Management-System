@@ -18,7 +18,7 @@ namespace InventoryManagement.Application.ResultHelpers
             ErrorMessage = error;
             ErrorType = errorType;  
         }
-        public static Result<T> Success(T value) => new(true, value, string.Empty);
+        public static Result<T> Success(T value = default!) => new(true, value, string.Empty);
         public static Result<T> Failure(string error  ,ErrorType errorType) => new(false, default, error  , errorType);
 
     }

@@ -17,9 +17,8 @@ namespace InventoryManagement.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateProductDTO dto, CancellationToken ct = default)
+        public async Task<IActionResult> Create( CreateProductDTO dto, CancellationToken ct = default)
         {
-
             var result = await _productService.CreateProductAsync(dto, ct);
             if (!result.IsSuccess)
             {
@@ -51,6 +50,24 @@ namespace InventoryManagement.API.Controllers
             var result = await _productService.GetAllProductsAsync(page, pageSize, ct);
             return Ok(result.Data);
 
+        }
+
+
+        [HttpPatch("{id}/info")]
+        public async Task<IActionResult> UpdateProductBasicInfo(Guid id , UpdateProductBasicInfoDTO dto   ,CancellationToken ct = default)
+        {
+            var result = await _productService.UpdateProductBasicInfoAsync(id , dto ,ct );
+            if (!result.IsSuccess)
+            {
+                switch (result.ErrorType)
+                {
+                    case ErrorType.NotFound: return NotFound(new { message = result.ErrorMessage });
+                    case ErrorType.Conflict: return Conflict(new { message = result.ErrorMessage });
+                        default:
+                        return BadRequest(result.ErrorMessage);     
+                }
+            }
+            return NoContent();     
         }
     }
 }
