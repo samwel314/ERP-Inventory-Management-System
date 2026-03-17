@@ -45,7 +45,7 @@ namespace InventoryManagement.Application.Validations
         }
         public static IRuleBuilderOptions<T , IFormFile?> ValidImage <T> (this IRuleBuilder <T , IFormFile?> rule)
         {
-            return rule.NotNull().Must(i => Allows.Any(a => i!= null &&  a == Path.GetExtension(i.FileName).ToLower())).WithMessage("allows types .jpg , .png");
+            return rule.NotNull().Must(i => i != null && Allows.Any(a => a == Path.GetExtension(i.FileName).ToLower())).WithMessage("allows types .jpg , .png");
         }
     }
 }

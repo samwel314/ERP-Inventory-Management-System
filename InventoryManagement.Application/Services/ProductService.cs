@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Net.WebSockets;
 using System.Text;
 
 namespace InventoryManagement.Application.Services
@@ -175,6 +176,28 @@ namespace InventoryManagement.Application.Services
             return Result<string>.Success();
         }
 
-
+        public async Task <Result<string>> UpdateProductImageAsync (Guid Id, UpdateProductImageDTO dto, CancellationToken ct = default)
+        {
+            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            if (product == null)
+                return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
+            if (dto.Image != null)
+            {
+                var imagePath = await SaveImageAsync(dto.Image!);
+                DeleteImage(product.ImageUrl);
+                product.UpdateImageUrl(imagePath); 
+                await _db.SaveChangesAsync(ct);       
+            }
+            return Result<string>.Success();
+        }
+        private void DeleteImage (string path )
+        {
+            if (string.IsNullOrWhiteSpace(path)) return;
+            path = path.Remove(0, 1); 
+            var webPath = _webenvironment.WebRootPath;          
+            var imagePath = Path.Combine(webPath, path);     
+            if (!File.Exists(imagePath)) return;
+            File.Delete(imagePath);        
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace InventoryManagement.Application.Validations
     {
         public UpdateProductImageDTOValidator()
         {
-            RuleFor(m => m.Image).ValidImage();
+            RuleFor(m => m.Image).ValidImage().When(m=>m.Image != null);
         }
     }
 }
