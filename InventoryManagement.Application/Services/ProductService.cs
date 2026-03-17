@@ -40,21 +40,21 @@ namespace InventoryManagement.Application.Services
             if (sameNameExist)
                 return Result<ProductDTO>.Failure("You already have product with this name in the category ", ErrorType.Conflict);
             // 400
-            var sameSDKExist = await SKDExist(dto.SKU!, ct);
+            var sameSDKExist = await SKUExist(dto.SKU!, ct);
             if (sameSDKExist)
                 return Result<ProductDTO>.Failure("You already have product with this SKU  ", ErrorType.Conflict);
 
             var imageUrl = await SaveImageAsync(dto.Image!);
 
             var Product = new Product(
-                dto.Name!.ToLower().Trim(),
-                dto.SKU!.ToLower()!.Trim(),
+                dto.Name!.Trim().ToLower(),
+                dto.SKU!.Trim().ToLower(),
                 dto.SellingPrice,
                 dto.PurchasePrice,
                 dto.MinimumStock,
                 imageUrl,
                 dto.CategoryId,
-                dto.Description);
+                dto.Description?.Trim());
             await _db.Products.CreateAsync(Product);
             await _db.SaveChangesAsync(ct);
             var productDTO = _mapper.Map<ProductDTO>(Product);
@@ -66,16 +66,18 @@ namespace InventoryManagement.Application.Services
         }
         private async Task<bool> SameNameInCategoryExist(int categoryId, string productName, CancellationToken ct)
         {
+            // sql server by default not case Sensitive
+            // productName = productName.Trim().ToLower();    
             return await _db.Products.GetAll().
                 AnyAsync
                 (p => p.CategoryId == categoryId &&
-                p.Name.ToLower() == productName.ToLower(), ct);
+                p.Name == productName, ct);
         }
-        private async Task<bool> SKDExist(string Skd, CancellationToken ct)
+        private async Task<bool> SKUExist(string Skd, CancellationToken ct)
         {
             return await _db.Products.GetAll().
                 AnyAsync
-                (p => p.SKU.ToLower() == Skd.ToLower().Trim(), ct);
+                (p => p.SKU == Skd, ct);
         }
         private async Task<string> SaveImageAsync(IFormFile image)
         {
@@ -89,8 +91,10 @@ namespace InventoryManagement.Application.Services
             await image.CopyToAsync(fileStream);
             return $"/Images/{fileName}"; ;
         }
-
-        // get all 
+        private async Task<Product?> GetProductAsync(Guid id, CancellationToken ct)
+        {
+            return await _db.Products.GetByIdAsync(id, ct, true);
+        }        // get all 
         public async Task<Result<Pagination<ProductDTO>>> GetAllProductsAsync(int page, int pageSize, CancellationToken ct = default)
         {
             var count =
@@ -119,7 +123,7 @@ namespace InventoryManagement.Application.Services
         public async Task<Result<string>> UpdateProductBasicInfoAsync(Guid Id, UpdateProductBasicInfoDTO dto, CancellationToken ct = default)
         {
             // load product 
-            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            var product = await GetProductAsync(Id, ct); 
             if (product == null)
                 return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
             // Work with Category 
@@ -142,7 +146,7 @@ namespace InventoryManagement.Application.Services
                 }
             }
             if (dto.Description != null && product.Description != dto.Description)
-                product.UpdateDescription(dto.Description);
+                product.UpdateDescription(dto.Description.Trim());
             if (dto.MinimumStock != null)
                 product.UpdateMinimumStock(dto.MinimumStock.Value);
             await _db.SaveChangesAsync(ct);
@@ -150,7 +154,7 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<string>> UpdateProductPricingAsync(Guid Id, UpdateProductPricingDTO dto, CancellationToken ct = default)
         {
-            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            var product = await GetProductAsync(Id, ct);
             if (product == null)
                 return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
             if (dto.PurchasePrice != null)
@@ -162,12 +166,12 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<string>> UpdateProductSKUAsync(Guid Id, UpdateProductSKUDTO dto, CancellationToken ct = default)
         {
-            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            var product = await GetProductAsync(Id, ct);
             if (product == null)
                 return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
             if (!product.SKU.Equals(dto.SKU!.ToLower().Trim() , StringComparison.OrdinalIgnoreCase))
             {
-                var sameSDKExist = await SKDExist(dto.SKU!, ct);
+                var sameSDKExist = await SKUExist(dto.SKU!, ct);
                 if (sameSDKExist)
                     return Result<string>.Failure("You already have product with this SKU  ", ErrorType.Conflict);
                 product.UpdateSKU(dto.SKU!.ToLower().Trim());
@@ -178,7 +182,7 @@ namespace InventoryManagement.Application.Services
 
         public async Task <Result<string>> UpdateProductImageAsync (Guid Id, UpdateProductImageDTO dto, CancellationToken ct = default)
         {
-            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            var product = await GetProductAsync(Id, ct);
             if (product == null)
                 return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
             if (dto.Image != null)
@@ -193,16 +197,16 @@ namespace InventoryManagement.Application.Services
         private void DeleteImage (string path )
         {
             if (string.IsNullOrWhiteSpace(path)) return;
-            path = path.Remove(0, 1); 
             var webPath = _webenvironment.WebRootPath;          
-            var imagePath = Path.Combine(webPath, path);     
+            // نتاكد ان مفيش اي بداية /// خالص 
+            var imagePath = Path.Combine(webPath, path.TrimStart('/'));     
             if (!File.Exists(imagePath)) return;
             File.Delete(imagePath);        
         }
 
         public async Task<Result<string>> ActiveProductAsync(Guid Id, CancellationToken ct = default)
         {
-            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            var product = await GetProductAsync(Id, ct);
             if (product == null)
                 return Result<string>.Failure("This product not Found", ErrorType.NotFound);
             product.Activate();
@@ -211,7 +215,7 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<string>> DeActiveProductAsync(Guid Id, CancellationToken ct = default)
         {
-            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            var product = await GetProductAsync(Id, ct);
             if (product == null)
                 return Result<string>.Failure("This product not Found", ErrorType.NotFound);
             product.Deactivate();
