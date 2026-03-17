@@ -4,7 +4,7 @@ namespace InventoryManagement.Application.DTO
 {
     public class UpdateProductImageDTO
     {
-        public IFormFile ? ImageUrl { get; set; }
+        public IFormFile ? Image { get; set; }
     }
 
 }

@@ -15,5 +15,4 @@
         public DateTime  CreatedAt {  get; set; }
         public decimal  ProfitPerUnit { get; set; }
     }
-
 }
