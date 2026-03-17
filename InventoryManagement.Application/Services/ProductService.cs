@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using InventoryManagement.Application.DTO;
 using InventoryManagement.Application.Persistence;
 using InventoryManagement.Application.ResultHelpers;
@@ -26,7 +27,7 @@ namespace InventoryManagement.Application.Services
             _mapper = mapper;
             _webenvironment = webenvironment;
         }
-
+        // Create 
         public async Task<Result<ProductDTO>> CreateProductAsync(CreateProductDTO dto ,CancellationToken ct )
         {
             // check category 404 
@@ -88,5 +89,31 @@ namespace InventoryManagement.Application.Services
             return $"/Images/{fileName}";;
         }
 
+        // get all 
+        public async Task <Result<Pagination<ProductDTO>>> GetAllProductsAsync(int page , int pageSize , CancellationToken ct = default)
+        {
+            var count =
+                 await _db.Products.GetAll().CountAsync(ct);
+            var pagination = new Pagination<ProductDTO>(count, pageSize, page); 
+           var products = 
+                await _db.Products.GetAll().
+                ProjectTo<ProductDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync(ct);
+            pagination.Items = products;    
+            return Result<Pagination<ProductDTO>>.Success(pagination);  
+        }
+  
+        public async Task<Result<ProductDTO>> GetProductAsync(Guid Id)
+        {
+            var  product =
+           await _db.Products.GetAll().
+            Where(p=>p.Id == Id).
+            ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).
+            FirstOrDefaultAsync();
+            if (product == null)
+                return Result<ProductDTO>.Failure("This Product Not Found", ErrorType.NotFound);
+
+            return Result<ProductDTO>.Success(product); 
+        }
     }
 }

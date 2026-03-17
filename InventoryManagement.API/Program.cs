@@ -13,20 +13,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(connectionString));
 builder.Services.AddUnitOfWorkAndRepository();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddAutoMapper(cfg =>
 {
-    cfg.AddProfile<MappingProfile>();       
+    cfg.AddProfile<MappingProfile>();
 });
 
 builder.Services.AddScoped<CategoryService, CategoryService>();
-builder.Services.AddScoped<ProductService, ProductService>(); 
+builder.Services.AddScoped<ProductService, ProductService>();
 builder.Services.AddOpenApi();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,8 +34,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-app.UseStaticFiles(); 
-app.UseRouting();       
+app.UseStaticFiles();
+app.UseRouting();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

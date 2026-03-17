@@ -481,4 +481,4 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 # Ignore uploaded images
-InventoryManagement.API/wwwroot/Images/
+**/wwwroot/

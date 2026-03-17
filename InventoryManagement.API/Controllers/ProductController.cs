@@ -1,7 +1,6 @@
 ﻿using InventoryManagement.Application.DTO;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.API.Controllers
@@ -17,8 +16,8 @@ namespace InventoryManagement.API.Controllers
             _productService = productService;
         }
 
-        [HttpPost] 
-        public async Task<IActionResult> Create(CreateProductDTO dto , CancellationToken ct = default )
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateProductDTO dto, CancellationToken ct = default)
         {
 
             var result = await _productService.CreateProductAsync(dto, ct);
@@ -39,9 +38,19 @@ namespace InventoryManagement.API.Controllers
         }
 
         [HttpGet("{id}", Name = "GetProductById")]
-        public IActionResult GetById (int id )
+        public async Task<IActionResult> GetById(Guid id)
         {
-            return Ok(new { id });  
+            var result = await _productService.GetProductAsync(id);   
+            if (!result.IsSuccess)
+              return NotFound(new { message = result.ErrorMessage });       
+            return Ok(result.Data);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetProducts(int page = 1, int pageSize = 5, CancellationToken ct = default)
+        {
+            var result = await _productService.GetAllProductsAsync(page, pageSize, ct);
+            return Ok(result.Data);
+
         }
     }
 }
