@@ -97,7 +97,7 @@ namespace InventoryManagement.Application.Services
                  await _db.Products.GetAll().CountAsync(ct);
             var pagination = new Pagination<ProductDTO>(count, pageSize, page);
             var products =
-                 await _db.Products.GetAll().
+                 await _db.Products.GetAll().Skip((pagination.pageNumber - 1  )* pagination.pageSize).Take(pagination.pageSize).
                  ProjectTo<ProductDTO>(_mapper.ConfigurationProvider)
                  .ToListAsync(ct);
             pagination.Items = products;
@@ -199,5 +199,25 @@ namespace InventoryManagement.Application.Services
             if (!File.Exists(imagePath)) return;
             File.Delete(imagePath);        
         }
+
+        public async Task<Result<string>> ActiveProductAsync(Guid Id, CancellationToken ct = default)
+        {
+            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            if (product == null)
+                return Result<string>.Failure("This product not Found", ErrorType.NotFound);
+            product.Activate();
+            await _db.SaveChangesAsync(ct);
+            return Result<string>.Success();
+        }
+        public async Task<Result<string>> DeActiveProductAsync(Guid Id, CancellationToken ct = default)
+        {
+            var product = await _db.Products.GetByIdAsync(Id, ct, true);
+            if (product == null)
+                return Result<string>.Failure("This product not Found", ErrorType.NotFound);
+            product.Deactivate();
+            await _db.SaveChangesAsync(ct);
+            return Result<string>.Success();
+        }
+
     }
 }

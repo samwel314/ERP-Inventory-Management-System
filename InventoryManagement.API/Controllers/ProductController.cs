@@ -101,5 +101,22 @@ namespace InventoryManagement.API.Controllers
                 return NotFound(new { message = result.ErrorMessage });
             return NoContent();
         }
+        [HttpPut("{Id}/activate")]
+        public async Task<IActionResult> ActiveProduct(Guid Id, CancellationToken ct = default)
+        {
+            var result = await _productService.ActiveProductAsync(Id, ct);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return NoContent(); ;
+        }
+        [HttpPut("{Id}/deactivate")]
+        public async Task<IActionResult> DeActiveProduct(Guid Id, CancellationToken ct = default)
+        {
+            var result = await _productService.DeActiveProductAsync(Id, ct);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage });
+            return NoContent(); ;
+        }
+
     }
 }
