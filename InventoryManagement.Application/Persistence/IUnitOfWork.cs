@@ -9,6 +9,6 @@ namespace InventoryManagement.Application.Persistence
     {
         ICategoryRepository Categories { get; }
         IProductRepository Products { get; }        
-        Task SaveChangesAsync();    
+        Task SaveChangesAsync(CancellationToken ct );    
     }
 }

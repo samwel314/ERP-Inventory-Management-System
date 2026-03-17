@@ -18,9 +18,9 @@ namespace InventoryManagement.Infrastructure.Persistence
         public ICategoryRepository Categories { get;  }
         public IProductRepository Products { get; }
 
-        public async Task SaveChangesAsync()
+        public async Task SaveChangesAsync(CancellationToken ct)
         {
-           await _db.SaveChangesAsync();     
+           await _db.SaveChangesAsync(ct);     
         }
     }
 }
