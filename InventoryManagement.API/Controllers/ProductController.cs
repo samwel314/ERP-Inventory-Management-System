@@ -69,5 +69,30 @@ namespace InventoryManagement.API.Controllers
             }
             return NoContent();     
         }
+        [HttpPatch("{id}/pricing")]
+        public async Task<IActionResult> UpdateProductPricingInfo(Guid id, UpdateProductPricingDTO dto, CancellationToken ct = default)
+        {
+            var result = await _productService.UpdateProductPricingAsync(id, dto, ct);
+            if (!result.IsSuccess)
+                return NotFound(new { message = result.ErrorMessage }); 
+            return NoContent();
+        }
+        [HttpPatch("{id}/sku")]
+        public async Task<IActionResult> UpdateProductSKUInfo(Guid id, UpdateProductSKUDTO dto, CancellationToken ct = default)
+        {
+            var result = await _productService.UpdateProductSKUAsync(id, dto, ct);
+            if (!result.IsSuccess)
+            {
+                switch (result.ErrorType)
+                {
+                    case ErrorType.NotFound: return NotFound(new { message = result.ErrorMessage });
+                    case ErrorType.Conflict: return Conflict(new { message = result.ErrorMessage });
+                    default:
+                        return BadRequest(result.ErrorMessage);
+                }
+            }
+            return NoContent();
+        }
+
     }
 }

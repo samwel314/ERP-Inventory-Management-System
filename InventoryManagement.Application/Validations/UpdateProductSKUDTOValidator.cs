@@ -7,7 +7,7 @@ namespace InventoryManagement.Application.Validations
     {
         public UpdateProductSKUDTOValidator()
         {
-            RuleFor(m => m.SKU).ValidSKU();
+            RuleFor(m => m.SKU).ValidSKU().When(o => o.SKU != null);
         }
     }
 }

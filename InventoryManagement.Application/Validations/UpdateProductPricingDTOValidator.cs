@@ -7,8 +7,8 @@ namespace InventoryManagement.Application.Validations
     {
         public UpdateProductPricingDTOValidator()
         {
-            RuleFor(m => m.SellingPrice).ValidSellingPrice();
-            RuleFor(m => m.PurchasePrice).ValidPurchasePrice();
+            RuleFor(m => m.SellingPrice).GreaterThanOrEqualTo(0.01m).When(o=>o.SellingPrice != null);
+            RuleFor(m => m.PurchasePrice).GreaterThanOrEqualTo(0.01m).When(o => o.PurchasePrice != null);
         }
     }
 }

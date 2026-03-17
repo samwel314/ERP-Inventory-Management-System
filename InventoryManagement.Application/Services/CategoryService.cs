@@ -27,7 +27,7 @@ namespace InventoryManagement.Application.Services
             var exist = await IsNameExist(model.Name , ct);
             if (exist)
                 return Result<CategoryDTO>.Failure("Category name already exists." , ErrorType.Conflict);
-            var category = new Category(model.Name.ToLower());
+            var category = new Category(model.Name.ToLower().Trim());
             await _db.Categories.CreateAsync(category , ct );
             await _db.SaveChangesAsync(ct);
             return Result<CategoryDTO>.Success(_mapper.Map<CategoryDTO>(category));

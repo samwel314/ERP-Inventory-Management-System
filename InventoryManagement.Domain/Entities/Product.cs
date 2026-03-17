@@ -62,6 +62,13 @@
             Name = name;
             UpdatedAt = DateTime.UtcNow;
         }
+        public void UpdateSKU(string sku)
+        {
+            ValidateSKU(sku);
+            SKU = sku;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
         private void ValidateImageUrl(string url)
         {
             if (string.IsNullOrWhiteSpace(url))
