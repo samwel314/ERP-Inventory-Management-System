@@ -29,20 +29,20 @@ namespace InventoryManagement.Application.Services
             _webenvironment = webenvironment;
         }
         // Create 
-        public async Task<Result<ProductDTO>> CreateProductAsync(CreateProductDTO dto, CancellationToken ct)
+        public async Task<Result<ProductDetailsDTO>> CreateProductAsync(CreateProductDTO dto, CancellationToken ct)
         {
             // check category 404 
             var categoryExist = await CategoryExist(dto.CategoryId, ct);
             if (!categoryExist)
-                return Result<ProductDTO>.Failure("This category Not Found ", ErrorType.NotFound);
+                return Result<ProductDetailsDTO>.Failure("This category Not Found ", ErrorType.NotFound);
             // 400
             var sameNameExist = await SameNameInCategoryExist(dto.CategoryId, dto.Name!, ct);
             if (sameNameExist)
-                return Result<ProductDTO>.Failure("You already have product with this name in the category ", ErrorType.Conflict);
+                return Result<ProductDetailsDTO>.Failure("You already have product with this name in the category ", ErrorType.Conflict);
             // 400
             var sameSDKExist = await SKUExist(dto.SKU!, ct);
             if (sameSDKExist)
-                return Result<ProductDTO>.Failure("You already have product with this SKU  ", ErrorType.Conflict);
+                return Result<ProductDetailsDTO>.Failure("You already have product with this SKU  ", ErrorType.Conflict);
 
             var imageUrl = await SaveImageAsync(dto.Image!);
 
@@ -57,8 +57,8 @@ namespace InventoryManagement.Application.Services
                 dto.Description?.Trim());
             await _db.Products.CreateAsync(Product);
             await _db.SaveChangesAsync(ct);
-            var productDTO = _mapper.Map<ProductDTO>(Product);
-            return Result<ProductDTO>.Success(productDTO);
+            var productDTO = _mapper.Map<ProductDetailsDTO>(Product);
+            return Result<ProductDetailsDTO>.Success(productDTO);
         }
         private async Task<bool> CategoryExist(int id, CancellationToken ct)
         {
@@ -95,30 +95,30 @@ namespace InventoryManagement.Application.Services
         {
             return await _db.Products.GetByIdAsync(id, ct, true);
         }        // get all 
-        public async Task<Result<Pagination<ProductDTO>>> GetAllProductsAsync(int page, int pageSize, CancellationToken ct = default)
+        public async Task<Result<Pagination<ProductDetailsDTO>>> GetAllProductsAsync(int page, int pageSize, CancellationToken ct = default)
         {
             var count =
                  await _db.Products.GetAll().CountAsync(ct);
-            var pagination = new Pagination<ProductDTO>(count, pageSize, page);
+            var pagination = new Pagination<ProductDetailsDTO>(count, pageSize, page);
             var products =
                  await _db.Products.GetAll().Skip((pagination.pageNumber - 1  )* pagination.pageSize).Take(pagination.pageSize).
-                 ProjectTo<ProductDTO>(_mapper.ConfigurationProvider)
+                 ProjectTo<ProductDetailsDTO>(_mapper.ConfigurationProvider)
                  .ToListAsync(ct);
             pagination.Items = products;
-            return Result<Pagination<ProductDTO>>.Success(pagination);
+            return Result<Pagination<ProductDetailsDTO>>.Success(pagination);
         }
 
-        public async Task<Result<ProductDTO>> GetProductAsync(Guid Id)
+        public async Task<Result<ProductDetailsDTO>> GetProductAsync(Guid Id)
         {
             var product =
            await _db.Products.GetAll().
             Where(p => p.Id == Id).
-            ProjectTo<ProductDTO>(_mapper.ConfigurationProvider).
+            ProjectTo<ProductDetailsDTO>(_mapper.ConfigurationProvider).
             FirstOrDefaultAsync();
             if (product == null)
-                return Result<ProductDTO>.Failure("This Product Not Found", ErrorType.NotFound);
+                return Result<ProductDetailsDTO>.Failure("This Product Not Found", ErrorType.NotFound);
 
-            return Result<ProductDTO>.Success(product);
+            return Result<ProductDetailsDTO>.Success(product);
         }
         public async Task<Result<string>> UpdateProductBasicInfoAsync(Guid Id, UpdateProductBasicInfoDTO dto, CancellationToken ct = default)
         {

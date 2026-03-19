@@ -1,6 +1,6 @@
 ﻿namespace InventoryManagement.Application.DTO
 {
-    public class ProductDTO
+    public class ProductDetailsDTO
     {
         public Guid Id { get; set; }    
         public string? Name { get; set; } = null!;
