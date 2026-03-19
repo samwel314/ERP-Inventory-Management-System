@@ -95,7 +95,7 @@ namespace InventoryManagement.Application.Services
         {
             return await _db.Products.GetByIdAsync(id, ct, true);
         }        // get all 
-        public async Task<Result<Pagination<ProductDetailsDTO>>> GetAllProductsAsync(int page, int pageSize, CancellationToken ct = default)
+        public async Task<Result<Pagination<ProductDetailsDTO>>> GetAllProductsWithDetailsAsync(int page, int pageSize, CancellationToken ct = default)
         {
             var count =
                  await _db.Products.GetAll().CountAsync(ct);
@@ -106,6 +106,18 @@ namespace InventoryManagement.Application.Services
                  .ToListAsync(ct);
             pagination.Items = products;
             return Result<Pagination<ProductDetailsDTO>>.Success(pagination);
+        }
+        public async Task<Result<Pagination<ProductListDTO>>> GetAllProductsAsync(int page, int pageSize, CancellationToken ct = default)
+        {
+            var count =
+                 await _db.Products.GetAll().CountAsync(ct);
+            var pagination = new Pagination<ProductListDTO>(count, pageSize, page);
+            var products =
+                 await _db.Products.GetAll().Skip((pagination.pageNumber - 1) * pagination.pageSize).Take(pagination.pageSize).
+                 ProjectTo<ProductListDTO>(_mapper.ConfigurationProvider)
+                 .ToListAsync(ct);
+            pagination.Items = products;
+            return Result<Pagination<ProductListDTO>>.Success(pagination);
         }
 
         public async Task<Result<ProductDetailsDTO>> GetProductAsync(Guid Id)

@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InventoryManagement.API.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/Products")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -37,11 +39,18 @@ namespace InventoryManagement.API.Controllers
         }
 
         [HttpGet("{id}", Name = "GetProductById")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<IActionResult> GetByIdv1(Guid id)
         {
             var result = await _productService.GetProductAsync(id);   
             if (!result.IsSuccess)
               return NotFound(new { message = result.ErrorMessage });       
+            return Ok(result.Data);
+        }
+        [MapToApiVersion("2.0")]
+        [HttpGet]
+        public async Task<IActionResult> GetProductsDetails(int page = 1, int pageSize = 5, CancellationToken ct = default)
+        {
+            var result = await _productService.GetAllProductsWithDetailsAsync(page, pageSize, ct);
             return Ok(result.Data);
         }
         [HttpGet]
@@ -49,7 +58,6 @@ namespace InventoryManagement.API.Controllers
         {
             var result = await _productService.GetAllProductsAsync(page, pageSize, ct);
             return Ok(result.Data);
-
         }
 
 

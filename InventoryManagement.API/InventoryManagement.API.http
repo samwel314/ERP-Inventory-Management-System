@@ -26,3 +26,13 @@ Content-Type: application/json
 ###
 PUT {{InventoryManagement.API_HostAddress}}/api/Categories/3/deactivate
 Content-Type: application/json
+
+###
+GET {{InventoryManagement.API_HostAddress}}/api/Products/
+Accept: application/json
+api-version : 2
+
+####
+GET {{InventoryManagement.API_HostAddress}}/api/Products/7B50D616-6D51-4BC4-B8A2-990B6C2CCCDC
+Accept: application/json
+api-version : 2

@@ -5,6 +5,8 @@ using InventoryManagement.Application.Services;
 using InventoryManagement.Application.Validations;
 using InventoryManagement.Infrastructure;
 using InventoryManagement.Infrastructure.Persistence.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +29,15 @@ builder.Services.AddScoped<ProductService, ProductService>();
 builder.Services.AddOpenApi();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>();
+
+//Config API Versioning 
+builder.Services.AddApiVersioning(opt =>
+{
+    opt.DefaultApiVersion = new ApiVersion(1, 0);
+    opt.AssumeDefaultVersionWhenUnspecified = true;
+    opt.ApiVersionReader = new HeaderApiVersionReader("api-version"); 
+});    
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
