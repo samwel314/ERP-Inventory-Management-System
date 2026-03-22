@@ -3,4 +3,5 @@
   <Project Path="InventoryManagement.Application/InventoryManagement.Application.csproj" />
   <Project Path="InventoryManagement.Domain/InventoryManagement.Domain.csproj" />
   <Project Path="InventoryManagement.Infrastructure/InventoryManagement.Infrastructure.csproj" />
+  <Project Path="InventoryManagement.UI/InventoryManagement.UI.csproj" Id="655796c1-1f85-4d35-9427-6f3f14ac5c02" />
 </Solution>
