@@ -44,13 +44,11 @@ namespace InventoryManagement.Application.Services
                 return Result<CategoryDTO>.Failure("Category not found." , ErrorType.NotFound);
             return  Result<CategoryDTO>.Success(_mapper.Map<CategoryDTO>(category)); 
         }
-        public async Task<Result<Pagination<CategoryDTO>>> GetCategoriesAsync(int  page  , int  pageSize , CancellationToken ct = default)
+        public async Task<Result<IEnumerable<CategoryDTO>>> GetCategoriesAsync(CancellationToken ct = default)
         {
-            var count  = await  _db.Categories.GetAll().CountAsync(ct);
-            Pagination<CategoryDTO> pagination = new Pagination<CategoryDTO>(count, pageSize,page);
-            var Categories  = await _db.Categories.GetAll().Skip(pagination.pageSize * (pagination.pageNumber - 1)).Take(pageSize).ToListAsync(ct);
-            pagination.Items = _mapper.Map<IEnumerable<CategoryDTO>>(Categories); 
-            return Result <Pagination<CategoryDTO>>.Success(pagination);
+            var Categories  = await _db.Categories.GetAll().ToListAsync(ct);
+            var dtos  = _mapper.Map<IEnumerable<CategoryDTO>>(Categories); 
+            return Result <IEnumerable< CategoryDTO >>.Success(dtos);
         }
         public async Task <Result <string>> UpdateCategoryAsync (int id ,  CreateUpdateCategoryDto model , CancellationToken ct = default)
         {

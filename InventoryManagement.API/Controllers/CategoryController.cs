@@ -34,9 +34,9 @@ namespace InventoryManagement.API.Controllers
             return Ok(result.Data);
         }
         [HttpGet]
-        public async Task<IActionResult> GetCategories(int page = 1, int pageSize = 5, CancellationToken ct = default)
+        public async Task<IActionResult> GetCategories( CancellationToken ct = default)
         {
-            var result = await _service.GetCategoriesAsync(page, pageSize, ct);
+            var result = await _service.GetCategoriesAsync(ct);
             return Ok(result.Data);
         }
         [HttpPut("{Id}")]
