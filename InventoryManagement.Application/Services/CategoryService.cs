@@ -4,6 +4,7 @@ using InventoryManagement.Application.Mapping;
 using InventoryManagement.Application.Persistence;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Domain.Entities;
+using InventoryManagement.Shared.DTO;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

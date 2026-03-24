@@ -27,9 +27,11 @@
     private ProductSearchFilter productSearchFilter = new();
     private PagedResult<ProductListDTO>? pagedResult;
     private IEnumerable<ProductListDTO>? products;
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+
     }
     private async Task LoadData()
     {
