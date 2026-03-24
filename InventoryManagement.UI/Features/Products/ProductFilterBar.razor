@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <select @bind="ProductSearchFilter.CategoryId" @bind:after="OnSizeChangeCategoryNotifyParent" class="form-select text-muted">
+                <select @bind="ProductSearchFilter.CategoryId"  class="form-select text-muted">
                     <option value="" selected>All Categories</option>
                     @if (categories != null)
                     {
@@ -23,7 +23,7 @@
             </div>
 
             <div class="col-md-3">
-                <select @bind="IsActive" @bind:after="OnSizeChangeActiveNotifyParent" class="form-select text-muted">
+                <select @bind="IsActive"  class="form-select text-muted">
                     <option value="" selected>Status: All</option>
                     <option value="true">Active Only</option>
                     <option value="false">Archived</option>
@@ -41,7 +41,7 @@
 <div class="row align-items-center mt-3">
     <div class="col-md-3 d-flex align-items-center">
         <label class="me-2 text-muted">Show:</label>
-        <select @bind="ProductSearchFilter.PageSize" @bind:after="OnSizeChangedNotifyParent" class="form-select form-select-sm w-auto">
+        <select @bind="ProductSearchFilter.PageSize"  class="form-select form-select-sm w-auto">
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="20">20</option>
@@ -56,12 +56,12 @@
                 }
                 else
                 {
-                    <li class="page-item"><button @onclick="@(async () => await ChangePage.InvokeAsync(ProductSearchFilter.PageNumber - 1))" class="page-link">Previous</button></li>
+                    <li class="page-item"><button @onclick="@(async () => await GoToPage(ProductSearchFilter.PageNumber - 1))" class="page-link">Previous</button></li>
                 }
                 @for (int i = 1; i <= ProductSearchFilter.TotalPages ; i ++)
                 {
                     var pageNumber = i;
-                    <li class="page-item  @(ProductSearchFilter.PageNumber == i ? "active" : "")"><button @onclick="@(async () => await ChangePage.InvokeAsync(pageNumber))" class="page-link">@i</button></li>
+                    <li class="page-item  @(ProductSearchFilter.PageNumber == i ? "active" : "")"><button @onclick="@(async () => await GoToPage(pageNumber))" class="page-link">@i</button></li>
                 }
                 @if (ProductSearchFilter.Next == 0)
                 {
@@ -69,7 +69,7 @@
                 }
                 else
                 {
-                    <li class="page-item"><button @onclick="@(async () => await ChangePage.InvokeAsync(ProductSearchFilter.PageNumber + 1))" class="page-link">Next</button></li>
+                    <li class="page-item"><button @onclick="@(async () => await GoToPage(ProductSearchFilter.PageNumber + 1))" class="page-link">Next</button></li>
                 }
             </ul>
         </nav>
@@ -80,52 +80,23 @@
     [Parameter , EditorRequired]
     public ProductSearchFilter ProductSearchFilter { get; set; }
     [Parameter, EditorRequired]
-    public EventCallback<int> ChangePageSize { get; set; }
-    [Parameter, EditorRequired]
-    public EventCallback<int> ChangePage { get; set; }
-    [Parameter, EditorRequired]
-
-    public EventCallback<int?> ChangeCategory { get; set; }
-    [Parameter, EditorRequired]
     public IEnumerable<CategoryDTO> categories { get; set; }
     [Parameter, EditorRequired]
-
-    public EventCallback<bool?> ChangeActive { get; set; }
-
-    private async Task OnSizeChangedNotifyParent()
-    {
-        await ChangePageSize.InvokeAsync(ProductSearchFilter.PageSize);
-    }
-    private async Task OnSizeChangeCategoryNotifyParent()
-    {
-        if (ProductSearchFilter.CategoryId is null )
-        {
-            await ChangeCategory.InvokeAsync();
-        }
-        else
-        {
-            await ChangeCategory.InvokeAsync(ProductSearchFilter.CategoryId.Value);
-        }
-    }
-    private async Task OnSizeChangeActiveNotifyParent()
-    {
-
-        if (string.IsNullOrEmpty(IsActive))
-        {
-            ProductSearchFilter.IsActive = null;
-
-            await ChangeActive.InvokeAsync();
-        }
-        else
-        {
-            ProductSearchFilter.IsActive = IsActive == "true" ? true : false;
-            await ChangeActive.InvokeAsync(ProductSearchFilter.IsActive);
-        }
-    }
-    [Parameter] public EventCallback OnApplyFilterRequested { get; set; }
+    public EventCallback CallParent {get ; set; }
     private async Task OnApplyFilter ()
     {
-        ProductSearchFilter.PageNumber = 1;
-        await OnApplyFilterRequested.InvokeAsync();
+        if (string.IsNullOrEmpty(IsActive))
+            ProductSearchFilter.IsActive = null ; 
+        else
+            ProductSearchFilter.IsActive = IsActive == "true";
+
+        ProductSearchFilter.PageNumber = 1 ; 
+        await CallParent.InvokeAsync() ; 
     }
-}
+    async Task  GoToPage (int page )
+    {
+        ProductSearchFilter.PageNumber = page;
+        await CallParent.InvokeAsync();
+
+    }
+} 

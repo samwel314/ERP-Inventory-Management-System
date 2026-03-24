@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using InventoryManagement.Application.DTO;
-using InventoryManagement.Shared.DTO;
 using InventoryManagement.Application.Persistence;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Domain.Entities;
+using InventoryManagement.Shared.DTO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +14,8 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
+using static System.Net.WebRequestMethods;
+using File = System.IO.File;
 
 namespace InventoryManagement.Application.Services
 {
@@ -108,7 +110,7 @@ namespace InventoryManagement.Application.Services
             pagination.Items = products;
             return Result<Pagination<ProductDetailsDTO>>.Success(pagination);
         }
-        public async Task<Result<Pagination<ProductListDTO>>> GetAllProductsAsync(int page, int pageSize, bool? active = null, int? categoryId = null  , CancellationToken ct = default)
+        public async Task<Result<Pagination<ProductListDTO>>> GetAllProductsAsync(int page, int pageSize, bool? active = null, int? categoryId = null , string? searchTerm = null , CancellationToken ct = default)
         {
             var baseQuery = _db.Products.GetAll();
 
@@ -117,7 +119,12 @@ namespace InventoryManagement.Application.Services
    
             if (active != null)
                 baseQuery = baseQuery.Where(p => p.IsActive == active);
-            
+            if (searchTerm != null)
+                baseQuery = baseQuery.Where(p => p.Name.Contains(searchTerm)
+                          || p.SKU.Contains(searchTerm));
+            Console.WriteLine("----------*-*-*----------------");
+            Console.WriteLine(baseQuery.ToQueryString());
+            Console.WriteLine("----------*-*-*----------------");
             var count = await baseQuery.CountAsync(ct);
             var pagination = new Pagination<ProductListDTO>(count, pageSize, page);
             var products = await baseQuery.OrderBy(p=> p.Name).Skip((pagination.pageNumber - 1) * pagination.pageSize).Take(pagination.pageSize).

@@ -9,7 +9,7 @@
 
     @*     <ProductSummaryCards />
  *@
-    <ProductFilterBar OnApplyFilterRequested="LoadData"  categories="Categories" ChangeCategory="ChangeCategory" ChangeActive="ChangeActive" ProductSearchFilter="productSearchFilter" ChangePage="ChangePage" ChangePageSize="ChangePageSize" />
+    <ProductFilterBar CallParent="LoadData"  categories="Categories"  ProductSearchFilter="productSearchFilter"   />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
@@ -71,29 +71,6 @@
             query.Clear(); 
         }
 
-    }
-    private async Task ChangePage(int page)
-    {
-        productSearchFilter.PageNumber = page;
-        await LoadData();
-    }
-    private async Task ChangeCategory(int? categoryId)
-    {
-        productSearchFilter.CategoryId = categoryId;
-        productSearchFilter.PageNumber = 1; 
-        await LoadData();
-    }
-    private async Task ChangeActive(bool ? isActive)
-    {
-        productSearchFilter.IsActive = isActive;
-        productSearchFilter.PageNumber = 1;
-        await LoadData();
-    }
-    private async Task ChangePageSize(int pageSize)
-    {
-        productSearchFilter.PageSize = pageSize;
-        productSearchFilter.PageNumber = 1; 
-        await LoadData();
     }
 
 }

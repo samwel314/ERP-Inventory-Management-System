@@ -55,9 +55,9 @@ namespace InventoryManagement.API.Controllers
             return Ok(result.Data);
         }
         [HttpGet]
-        public async Task<IActionResult> GetProducts(int page = 1, int pageSize = 5,  bool ?active = null , int ? categoryId = null,   CancellationToken ct = default)
+        public async Task<IActionResult> GetProducts(int page = 1, int pageSize = 5,  bool ?active = null , int ? categoryId = null, string ? searchTerm  = null,    CancellationToken ct = default)
         {
-            var result = await _productService.GetAllProductsAsync(page, pageSize, active , categoryId ,  ct);
+            var result = await _productService.GetAllProductsAsync(page, pageSize, active , categoryId ,searchTerm,  ct);
             return Ok(result.Data);
         }
 
