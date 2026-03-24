@@ -1,0 +1,86 @@
+﻿<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="oi oi-magnifying-glass"></i>
+                    </span>
+                    <input type="text" class="form-control border-start-0" placeholder="Search by SKU or Product Name..." />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select text-muted">
+                    <option selected>All Categories</option>
+                    <option value="1">Electronics</option>
+                    <option value="2">Home Appliances</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select text-muted">
+                    <option selected>Status: All</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Archived</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100">
+                    <i class="oi oi-funnel me-1"></i> Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center mt-3">
+    <div class="col-md-3 d-flex align-items-center">
+        <label class="me-2 text-muted">Show:</label>
+        <select @bind="ProductSearchFilter.PageSize" @bind:after="OnSizeChangedNotifyParent" class="form-select form-select-sm w-auto">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+        </select>
+    </div>
+    <div class="col-md-9 d-flex justify-content-end">
+        <nav>
+            <ul class="pagination pagination-sm mb-0">
+                @if (ProductSearchFilter.Previous == 0)
+                {
+                    <li class="page-item"><button disabled class="page-link">Previous</button></li>
+                }
+                else
+                {
+                    <li class="page-item"><button @onclick="@(async () => await ChangePage.InvokeAsync(ProductSearchFilter.PageNumber - 1))" class="page-link">Previous</button></li>
+                }
+                @for (int i = 1; i <= ProductSearchFilter.TotalPages ; i ++)
+                {
+                    var pageNumber = i;
+                    <li class="page-item  @(ProductSearchFilter.PageNumber == i ? "active" : "")"><button @onclick="@(async () => await ChangePage.InvokeAsync(pageNumber))" class="page-link">@i</button></li>
+                }
+                @if (ProductSearchFilter.Next == 0)
+                {
+                    <li class="page-item"><button disabled class="page-link">Next</button></li>
+                }
+                else
+                {
+                    <li class="page-item"><button @onclick="@(async () => await ChangePage.InvokeAsync(ProductSearchFilter.PageNumber + 1))" class="page-link">Next</button></li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+@code{
+    [Parameter , EditorRequired]
+    public ProductSearchFilter ProductSearchFilter { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<int> ChangePageSize { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<int> ChangePage { get; set; }
+
+    private async Task OnSizeChangedNotifyParent()
+    {
+        await ChangePageSize.InvokeAsync(ProductSearchFilter.PageSize);
+    }
+}

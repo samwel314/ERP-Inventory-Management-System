@@ -29,7 +29,15 @@ builder.Services.AddScoped<ProductService, ProductService>();
 builder.Services.AddOpenApi();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OpenCorsPolicy", policy =>
+    {
+        policy.WithOrigins("https://localhost:7161") // بورت البلازور بتاعك
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 //Config API Versioning 
 builder.Services.AddApiVersioning(opt =>
 {
@@ -48,7 +56,7 @@ if (app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 app.UseHttpsRedirection();
-
+app.UseCors("OpenCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

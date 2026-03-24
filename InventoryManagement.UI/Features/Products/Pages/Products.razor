@@ -1,0 +1,61 @@
+﻿@page "/products"
+<div class="container-fluid p-4 bg-light min-vh-100">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-navy">Inventory Management</h3>
+        <a href="/products/add" class="btn btn-primary shadow-sm px-4">
+            <i class="oi oi-plus me-2"></i> Add New Product
+        </a>
+    </div>
+
+    @*     <ProductSummaryCards />
+ *@
+    <ProductFilterBar ProductSearchFilter="productSearchFilter" ChangePage="ChangePage" ChangePageSize="ChangePageSize" />
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <ProductDataGrid products="products" />
+        </div>
+    </div>
+</div>
+
+@* <PricingUpdateModal /> *@
+@* <SkuUpdateModal /> *@
+@code
+{
+    [Inject]
+    public HttpClient? ProductHttpClient { get; set; }
+    private ProductSearchFilter productSearchFilter = new();
+    private PagedResult<ProductListDTO>? pagedResult;
+    private IEnumerable<ProductListDTO>? products;
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+    private async Task LoadData()
+    {
+        pagedResult =
+        await ProductHttpClient!.
+        GetFromJsonAsync<PagedResult<ProductListDTO>>
+        ($"{UrlsPath.BaseUrl}{UrlsPath.Products}?page={productSearchFilter.PageNumber}&&pageSize={productSearchFilter.PageSize}");
+        if (pagedResult != null)
+        {
+            products = pagedResult.Items;
+            productSearchFilter.Next = pagedResult.Next;
+            productSearchFilter.Previous = pagedResult.Previous;
+            productSearchFilter.TotalPages = pagedResult.TotalPages;
+        }
+
+    }
+    private async Task ChangePage(int page)
+    {
+        productSearchFilter.PageNumber = page;
+        await LoadData();
+    }
+    private async Task ChangePageSize(int pageSize)
+    {
+        productSearchFilter.PageSize = pageSize;
+        productSearchFilter.PageNumber = 1; 
+        await LoadData();
+    }
+
+}

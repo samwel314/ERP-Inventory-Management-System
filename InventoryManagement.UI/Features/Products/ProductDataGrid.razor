@@ -1,0 +1,96 @@
+﻿<table class="table table-hover align-middle mb-0 shadow-sm border">
+    <thead class="bg-light text-muted small shadow-sm">
+        <tr>
+            <th class="ps-3" style="width: 30%">PRODUCT & IMAGE</th>
+            <th style="width: 15%">CATEGORY</th>
+            <th style="width: 15%">SALE PRICE</th>
+            <th style="width: 15%">STATUS</th>
+            <th class="text-end pe-4" style="width: 25%">MANAGE DETAILS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (products is null || !products.Any())
+        {
+            <tr>
+                <td colspan="5" class="py-5">
+                    <div class="text-center my-5">
+                        <div class="mb-3">
+                            <i class="oi oi-box text-light" style="font-size: 5rem;"></i>
+                        </div>
+                
+                        <h5 class="text-secondary fw-bold">No Products Found</h5>
+                        <p class="text-muted mb-4">
+                            It looks like you haven't added any products yet, <br />
+                            or no results match your current filters.
+                        </p>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn btn-primary px-4 shadow-sm" @* @onclick="OpenAddProductModal" *@>
+                                <i class="oi oi-plus me-2"></i>Add First Product
+                            </button>
+                            <button class="btn btn-outline-secondary px-4" @* @onclick="ClearFilters" *@>
+                                Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+        else
+        {
+            foreach (var  product in products)
+            {
+                <tr>
+                    <td class="ps-3">
+                        <div class="d-flex align-items-center">
+                            <div class="position-relative me-3 group" style="cursor:pointer" title="Update Image">
+                                <img src="@product.ImageUrl" class="rounded-2 border" style="width:45px; height:45px;" />
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25 rounded-2 opacity-0 hover-opacity-100 transition-sm">
+                                    <i class="oi oi-camera text-white small"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-primary" style="cursor:pointer" title="Edit Basic Info">
+                                    @product.Name
+                                </div>
+                                <small class="text-muted">ID: @product.SKU</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark border fw-normal">@product.CategoryName</span>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-dark">@product.SellingPrice.ToString("c")</div>
+                    </td>
+                    <td>
+                        @* زرار الـ Activate/Deactivate اللي عندك في الـ Controller *@
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" checked role="switch">
+                            <small class="text-muted px-1">@(product.IsActive ? "Active" : "Not Active") </small>
+                        </div>
+                    </td>
+                    <td class="text-end pe-3">
+                        <div class="btn-group shadow-sm bg-white border rounded p-1">
+                            <button class="btn btn-sm btn-light border-0 text-success px-2" title="Pricing & Profit">
+                                <i class="oi oi-dollar"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light border-0 text-secondary px-2 border-start" title="Stock & SKU">
+                                <i class="oi oi-barcode"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light border-0 text-primary px-2 border-start" title="Full Details">
+                                <i class="oi oi-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+            }
+        }
+    </tbody>
+</table>
+@code{
+
+    [Parameter , EditorRequired ]
+    public IEnumerable<ProductListDTO> products { get; set; }
+}

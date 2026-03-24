@@ -2,6 +2,7 @@
 using InventoryManagement.Application.DTO;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Domain.Entities;
+using InventoryManagement.Shared.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
