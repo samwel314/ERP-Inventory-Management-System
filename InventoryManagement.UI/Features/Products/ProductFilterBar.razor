@@ -6,28 +6,32 @@
                     <span class="input-group-text bg-white border-end-0 text-muted">
                         <i class="oi oi-magnifying-glass"></i>
                     </span>
-                    <input type="text" class="form-control border-start-0" placeholder="Search by SKU or Product Name..." />
+                    <input type="text" @bind="ProductSearchFilter.SearchTerm" class="form-control border-start-0" placeholder="Search by SKU or Product Name..." />
                 </div>
             </div>
-
             <div class="col-md-3">
-                <select class="form-select text-muted">
-                    <option selected>All Categories</option>
-                    <option value="1">Electronics</option>
-                    <option value="2">Home Appliances</option>
+                <select @bind="ProductSearchFilter.CategoryId" @bind:after="OnSizeChangeCategoryNotifyParent" class="form-select text-muted">
+                    <option value="" selected>All Categories</option>
+                    @if (categories != null)
+                    {
+                        @foreach (var category in categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    }
                 </select>
             </div>
 
             <div class="col-md-3">
-                <select class="form-select text-muted">
-                    <option selected>Status: All</option>
-                    <option value="active">Active Only</option>
-                    <option value="inactive">Archived</option>
+                <select @bind="IsActive" @bind:after="OnSizeChangeActiveNotifyParent" class="form-select text-muted">
+                    <option value="" selected>Status: All</option>
+                    <option value="true">Active Only</option>
+                    <option value="false">Archived</option>
                 </select>
             </div>
 
             <div class="col-md-2">
-                <button class="btn btn-outline-primary w-100">
+                <button @onclick="OnApplyFilter" class="btn btn-outline-primary w-100">
                     <i class="oi oi-funnel me-1"></i> Apply Filter
                 </button>
             </div>
@@ -72,15 +76,56 @@
     </div>
 </div>
 @code{
+    private string IsActive = "" ; 
     [Parameter , EditorRequired]
     public ProductSearchFilter ProductSearchFilter { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<int> ChangePageSize { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<int> ChangePage { get; set; }
+    [Parameter, EditorRequired]
+
+    public EventCallback<int?> ChangeCategory { get; set; }
+    [Parameter, EditorRequired]
+    public IEnumerable<CategoryDTO> categories { get; set; }
+    [Parameter, EditorRequired]
+
+    public EventCallback<bool?> ChangeActive { get; set; }
 
     private async Task OnSizeChangedNotifyParent()
     {
         await ChangePageSize.InvokeAsync(ProductSearchFilter.PageSize);
+    }
+    private async Task OnSizeChangeCategoryNotifyParent()
+    {
+        if (ProductSearchFilter.CategoryId is null )
+        {
+            await ChangeCategory.InvokeAsync();
+        }
+        else
+        {
+            await ChangeCategory.InvokeAsync(ProductSearchFilter.CategoryId.Value);
+        }
+    }
+    private async Task OnSizeChangeActiveNotifyParent()
+    {
+
+        if (string.IsNullOrEmpty(IsActive))
+        {
+            ProductSearchFilter.IsActive = null;
+
+            await ChangeActive.InvokeAsync();
+        }
+        else
+        {
+            ProductSearchFilter.IsActive = IsActive == "true" ? true : false;
+            await ChangeActive.InvokeAsync(ProductSearchFilter.IsActive);
+        }
+    }
+    [Parameter] public EventCallback OnApplyFilterRequested { get; set; }
+    private async Task OnApplyFilter ()
+    {
+        ProductSearchFilter.PageNumber = 1;
+        await OnApplyFilterRequested.InvokeAsync();
     }
 }

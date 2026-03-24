@@ -9,7 +9,7 @@
 
     @*     <ProductSummaryCards />
  *@
-    <ProductFilterBar ProductSearchFilter="productSearchFilter" ChangePage="ChangePage" ChangePageSize="ChangePageSize" />
+    <ProductFilterBar OnApplyFilterRequested="LoadData"  categories="Categories" ChangeCategory="ChangeCategory" ChangeActive="ChangeActive" ProductSearchFilter="productSearchFilter" ChangePage="ChangePage" ChangePageSize="ChangePageSize" />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
@@ -27,30 +27,66 @@
     private ProductSearchFilter productSearchFilter = new();
     private PagedResult<ProductListDTO>? pagedResult;
     private IEnumerable<ProductListDTO>? products;
-    
+    private IEnumerable<CategoryDTO> ? Categories  ; 
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
+        Categories = await ProductHttpClient!.
+        GetFromJsonAsync<IEnumerable<CategoryDTO>>
+        ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}") ; 
 
     }
     private async Task LoadData()
     {
+        List<string> query = new List<string>();
+
+        query.Add($"page={productSearchFilter.PageNumber}");
+        query.Add($"pageSize={productSearchFilter.PageSize}");
+
+        if (productSearchFilter.CategoryId.HasValue)
+        {
+            query.Add($"categoryId={productSearchFilter.CategoryId}");
+        }
+        if (!string.IsNullOrWhiteSpace(productSearchFilter.SearchTerm))
+        {
+            query.Add($"searchTerm={productSearchFilter.SearchTerm}");
+        }
+        if (productSearchFilter.IsActive.HasValue)
+        {
+            query.Add($"active={productSearchFilter.IsActive}");
+        }
+        var fullQuery = string.Join("&" , query) ;
+        Console.WriteLine(fullQuery);
         pagedResult =
         await ProductHttpClient!.
         GetFromJsonAsync<PagedResult<ProductListDTO>>
-        ($"{UrlsPath.BaseUrl}{UrlsPath.Products}?page={productSearchFilter.PageNumber}&&pageSize={productSearchFilter.PageSize}");
+        ($"{UrlsPath.BaseUrl}{UrlsPath.Products}?{fullQuery}");
         if (pagedResult != null)
         {
             products = pagedResult.Items;
             productSearchFilter.Next = pagedResult.Next;
             productSearchFilter.Previous = pagedResult.Previous;
             productSearchFilter.TotalPages = pagedResult.TotalPages;
+            query.Clear(); 
         }
 
     }
     private async Task ChangePage(int page)
     {
         productSearchFilter.PageNumber = page;
+        await LoadData();
+    }
+    private async Task ChangeCategory(int? categoryId)
+    {
+        productSearchFilter.CategoryId = categoryId;
+        productSearchFilter.PageNumber = 1; 
+        await LoadData();
+    }
+    private async Task ChangeActive(bool ? isActive)
+    {
+        productSearchFilter.IsActive = isActive;
+        productSearchFilter.PageNumber = 1;
         await LoadData();
     }
     private async Task ChangePageSize(int pageSize)

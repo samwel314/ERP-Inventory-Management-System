@@ -2,6 +2,7 @@
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.Design;
 
 namespace InventoryManagement.API.Controllers
 {
@@ -54,9 +55,9 @@ namespace InventoryManagement.API.Controllers
             return Ok(result.Data);
         }
         [HttpGet]
-        public async Task<IActionResult> GetProducts(int page = 1, int pageSize = 5, CancellationToken ct = default)
+        public async Task<IActionResult> GetProducts(int page = 1, int pageSize = 5,  bool ?active = null , int ? categoryId = null,   CancellationToken ct = default)
         {
-            var result = await _productService.GetAllProductsAsync(page, pageSize, ct);
+            var result = await _productService.GetAllProductsAsync(page, pageSize, active , categoryId ,  ct);
             return Ok(result.Data);
         }
 

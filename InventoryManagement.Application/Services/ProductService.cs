@@ -108,13 +108,19 @@ namespace InventoryManagement.Application.Services
             pagination.Items = products;
             return Result<Pagination<ProductDetailsDTO>>.Success(pagination);
         }
-        public async Task<Result<Pagination<ProductListDTO>>> GetAllProductsAsync(int page, int pageSize, CancellationToken ct = default)
+        public async Task<Result<Pagination<ProductListDTO>>> GetAllProductsAsync(int page, int pageSize, bool? active = null, int? categoryId = null  , CancellationToken ct = default)
         {
-            var count =
-                 await _db.Products.GetAll().CountAsync(ct);
+            var baseQuery = _db.Products.GetAll();
+
+            if (categoryId != null)
+                baseQuery = baseQuery.Where(p => p.CategoryId == categoryId);
+   
+            if (active != null)
+                baseQuery = baseQuery.Where(p => p.IsActive == active);
+            
+            var count = await baseQuery.CountAsync(ct);
             var pagination = new Pagination<ProductListDTO>(count, pageSize, page);
-            var products =
-                 await _db.Products.GetAll().Skip((pagination.pageNumber - 1) * pagination.pageSize).Take(pagination.pageSize).
+            var products = await baseQuery.OrderBy(p=> p.Name).Skip((pagination.pageNumber - 1) * pagination.pageSize).Take(pagination.pageSize).
                  ProjectTo<ProductListDTO>(_mapper.ConfigurationProvider)
                  .ToListAsync(ct);
             pagination.Items = products;
