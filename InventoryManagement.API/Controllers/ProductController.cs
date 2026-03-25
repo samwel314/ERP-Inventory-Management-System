@@ -40,7 +40,7 @@ namespace InventoryManagement.API.Controllers
         }
 
         [HttpGet("{id}", Name = "GetProductById")]
-        public async Task<IActionResult> GetByIdv1(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _productService.GetProductAsync(id);   
             if (!result.IsSuccess)
