@@ -64,9 +64,8 @@
                         <div class="fw-bold text-dark">@product.SellingPrice.ToString("c")</div>
                     </td>
                     <td>
-                        @* زرار الـ Activate/Deactivate اللي عندك في الـ Controller *@
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" checked role="switch">
+                            <input class="form-check-input" @onchange="() => ChangeStatus.InvokeAsync(product)" type="checkbox" checked="@product.IsActive" role="switch">
                             <small class="text-muted px-1">@(product.IsActive ? "Active" : "Not Active") </small>
                         </div>
                     </td>
@@ -93,4 +92,7 @@
 
     [Parameter , EditorRequired ]
     public IEnumerable<ProductListDTO> products { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<ProductListDTO> ChangeStatus { get; set; }
+
 }

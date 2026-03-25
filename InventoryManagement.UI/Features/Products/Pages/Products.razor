@@ -7,13 +7,13 @@
         </a>
     </div>
 
-    @*     <ProductSummaryCards />
- *@
+    <ProductSummaryCards />
+
     <ProductFilterBar CallParent="LoadData"  categories="Categories"  ProductSearchFilter="productSearchFilter"   />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-            <ProductDataGrid products="products" />
+            <ProductDataGrid products="products" ChangeStatus="ChangeStatus" />
         </div>
     </div>
 </div>
@@ -68,9 +68,27 @@
             productSearchFilter.Next = pagedResult.Next;
             productSearchFilter.Previous = pagedResult.Previous;
             productSearchFilter.TotalPages = pagedResult.TotalPages;
-            query.Clear(); 
         }
 
     }
+    private async Task ChangeStatus(ProductListDTO product)
+    {
+        var url = $"{UrlsPath.BaseUrl}{UrlsPath.Products}";
+        if (product.IsActive)
+            url = url + $"/{product.Id}/deactivate";
+        else
+            url = url + $"/{product.Id}/activate";
+              
+        var response = await ProductHttpClient!.PutAsync(url ,  null);
 
+        if (response.IsSuccessStatusCode)
+        {
+            product.IsActive = !product.IsActive;
+            Console.WriteLine($"Product {product.Name} is now {(product.IsActive ? "Active" : "Deactivated")}");
+        }
+        else
+        {
+            Console.WriteLine("Error updating status");
+        }
+    }
 }
