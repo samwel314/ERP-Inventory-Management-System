@@ -13,11 +13,28 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-            <ProductDataGrid products="products" ChangeStatus="ChangeStatus" />
+            <ProductDataGrid products="products" ChangeStatus="ChangeStatus" OnViewDetails="LoadSelectedProduct" />
         </div>
     </div>
 </div>
-
+<div class="offcanvas offcanvas-end @(isPanelOpen ? "show" : "")" style="..." tabindex="-1">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title">Product Insights</h5>
+        <button type="button" class="btn-close" @onclick="ClosePanel"></button>
+    </div>
+    <div class="offcanvas-body">
+        @if (isLoadingDetails)
+        {
+            <div class="d-flex justify-content-center mt-5">
+                <div class="spinner-grow text-primary" role="status"></div>
+            </div>
+        }
+        else
+        {
+            <ProductDetailsView Product="selectedProduct" />
+        }
+    </div>
+</div>
 @* <PricingUpdateModal /> *@
 @* <SkuUpdateModal /> *@
 @code
@@ -28,7 +45,9 @@
     private PagedResult<ProductListDTO>? pagedResult;
     private IEnumerable<ProductListDTO>? products;
     private IEnumerable<CategoryDTO> ? Categories  ; 
-
+    private ProductDetailsDTO ?selectedProduct ; 
+    private bool isPanelOpen = false ; 
+    private bool isLoadingDetails = true ; 
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -78,7 +97,7 @@
             url = url + $"/{product.Id}/deactivate";
         else
             url = url + $"/{product.Id}/activate";
-              
+
         var response = await ProductHttpClient!.PutAsync(url ,  null);
 
         if (response.IsSuccessStatusCode)
@@ -90,5 +109,23 @@
         {
             Console.WriteLine("Error updating status");
         }
+    }
+
+    private void ClosePanel ()
+    {
+        isPanelOpen = false ; 
+        isLoadingDetails = true ; 
+    }
+
+    private async Task LoadSelectedProduct (ProductListDTO product)
+    {
+        isPanelOpen = true;
+        if (selectedProduct == null || selectedProduct.Id != product.Id)
+        {
+            isLoadingDetails = true ; 
+            selectedProduct = await ProductHttpClient!.GetFromJsonAsync<ProductDetailsDTO>
+              ($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{product.Id}");
+        }
+        isLoadingDetails = false ; 
     }
 }

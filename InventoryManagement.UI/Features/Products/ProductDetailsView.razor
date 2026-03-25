@@ -47,7 +47,11 @@
             <h6 class="fw-bold">Description</h6>
             <p class="text-muted small">@Product.Description</p>
         </div>
+        <strong class="@(Product.ProfitPerUnit > 100 ? "text-success" : "text-warning")">
+            @Product.ProfitPerUnit
+        </strong>
     </div>
+
 }
 
 @code {

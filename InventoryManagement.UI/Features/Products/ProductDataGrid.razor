@@ -82,6 +82,22 @@
                             </button>
                         </div>
                     </td>
+                        <td class="text-center">
+                            <div class="btn-group shadow-sm">
+                                <button class="btn btn-sm btn-light border"
+                                        title="View Details"
+                                        @onclick="() => OnViewDetails.InvokeAsync(product)">
+                                    <i class="bi bi-eye text-primary"></i> View
+                                </button>
+                        
+                                @* اختياري: زرار المسح *@
+                                <button class="btn btn-sm btn-light border text-danger"
+                                        title="Delete Product">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+
                 </tr>
 
             }
@@ -94,5 +110,7 @@
     public IEnumerable<ProductListDTO> products { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<ProductListDTO> ChangeStatus { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<ProductListDTO> OnViewDetails { get; set; }
 
 }
