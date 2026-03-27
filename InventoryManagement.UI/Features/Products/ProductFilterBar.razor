@@ -1,4 +1,5 @@
-﻿<div class="card border-0 shadow-sm mb-4">
+﻿@inject NavigationManager NavManager
+<div class="card border-0 shadow-sm mb-4">
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-4">
@@ -81,22 +82,43 @@
     public ProductSearchFilter ProductSearchFilter { get; set; }
     [Parameter, EditorRequired]
     public IEnumerable<CategoryDTO> categories { get; set; }
-    [Parameter, EditorRequired]
-    public EventCallback CallParent {get ; set; }
+
+
     private async Task OnApplyFilter ()
     {
         if (string.IsNullOrEmpty(IsActive))
             ProductSearchFilter.IsActive = null ; 
         else
             ProductSearchFilter.IsActive = IsActive == "true";
-
         ProductSearchFilter.PageNumber = 1 ; 
-        await CallParent.InvokeAsync() ; 
+        var queryParams = new Dictionary<string, object?>
+
+        {
+            [nameof(ProductSearchFilter.SearchTerm)] = ProductSearchFilter.SearchTerm,
+            [nameof(ProductSearchFilter.CategoryId)] = ProductSearchFilter.CategoryId ,
+            [nameof(ProductSearchFilter.IsActive)] = ProductSearchFilter.IsActive,
+            [nameof(ProductSearchFilter.PageSize)] = ProductSearchFilter.PageSize,
+            [nameof(ProductSearchFilter.PageNumber)] = ProductSearchFilter.PageNumber,
+        };
+        
+        var newUri = NavManager.GetUriWithQueryParameters(queryParams);
+        NavManager.NavigateTo(newUri);
     }
     async Task  GoToPage (int page )
     {
         ProductSearchFilter.PageNumber = page;
-        await CallParent.InvokeAsync();
 
+        var queryParams = new Dictionary<string, object?>
+
+        {
+            [nameof(ProductSearchFilter.SearchTerm)] = ProductSearchFilter.SearchTerm,
+            [nameof(ProductSearchFilter.CategoryId)] = ProductSearchFilter.CategoryId,
+            [nameof(ProductSearchFilter.IsActive)] = ProductSearchFilter.IsActive,
+            [nameof(ProductSearchFilter.PageSize)] = ProductSearchFilter.PageSize,
+            [nameof(ProductSearchFilter.PageNumber)] = ProductSearchFilter.PageNumber,
+        };
+        
+        var newUri = NavManager.GetUriWithQueryParameters(queryParams);
+        NavManager.NavigateTo(newUri);
     }
 } 

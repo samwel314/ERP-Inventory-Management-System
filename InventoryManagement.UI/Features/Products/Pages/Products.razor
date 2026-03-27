@@ -9,7 +9,7 @@
 
     <ProductSummaryCards />
 
-    <ProductFilterBar CallParent="LoadData"  categories="Categories"  ProductSearchFilter="productSearchFilter"   />
+    <ProductFilterBar  categories="Categories"  ProductSearchFilter="productSearchFilter"   />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
@@ -39,6 +39,12 @@
 @* <SkuUpdateModal /> *@
 @code
 {
+    [Parameter, SupplyParameterFromQuery] public string? SearchTerm { get; set; }
+    [Parameter, SupplyParameterFromQuery] public int? CategoryId { get; set; }
+    [Parameter, SupplyParameterFromQuery] public bool? IsActive { get; set; }
+    [Parameter, SupplyParameterFromQuery] public int PageNumber { get; set; } = 1;
+    [Parameter, SupplyParameterFromQuery] public int PageSize { get; set; } = 5;
+
     [Inject]
     public HttpClient? ProductHttpClient { get; set; }
     private ProductSearchFilter productSearchFilter = new();
@@ -50,16 +56,24 @@
     private bool isLoadingDetails = true ; 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
         Categories = await ProductHttpClient!.
         GetFromJsonAsync<IEnumerable<CategoryDTO>>
         ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}/lookUp");
-
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        productSearchFilter.CategoryId = CategoryId ; 
+        productSearchFilter.IsActive = IsActive ; 
+        productSearchFilter.SearchTerm = SearchTerm ; 
+        productSearchFilter.PageNumber = PageNumber > 0 ? PageNumber : 1;
+        productSearchFilter.PageSize = PageSize > 0 ? PageSize : 5;
+        await LoadData() ; 
     }
     private async Task LoadData()
     {
         List<string> query = new List<string>();
-
+        if (PageNumber == 0) PageNumber = 1;
+        if (PageSize == 0) PageSize = 5;
         query.Add($"page={productSearchFilter.PageNumber}");
         query.Add($"pageSize={productSearchFilter.PageSize}");
 
