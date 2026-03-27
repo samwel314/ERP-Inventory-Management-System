@@ -39,6 +39,12 @@ namespace InventoryManagement.API.Controllers
             var result = await _service.GetCategoriesLookUpAsync(ct);
             return Ok(result.Data);
         }
+        [HttpGet()]
+        public async Task<IActionResult> GetCategories(CancellationToken ct = default)
+        {
+            var result = await _service.GetCategoriesAsync(ct);
+            return Ok(result.Data);
+        }
         [HttpPut("{Id}")]
         public async Task<IActionResult> UpdateCategory(int Id, CreateUpdateCategoryDto Model, CancellationToken ct = default)
         {
