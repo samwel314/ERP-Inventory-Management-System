@@ -45,7 +45,7 @@ namespace InventoryManagement.Application.Services
                 return Result<CategoryDTO>.Failure("Category not found." , ErrorType.NotFound);
             return  Result<CategoryDTO>.Success(_mapper.Map<CategoryDTO>(category)); 
         }
-        public async Task<Result<IEnumerable<CategoryDTO>>> GetCategoriesAsync(CancellationToken ct = default)
+        public async Task<Result<IEnumerable<CategoryDTO>>> GetCategoriesLookUpAsync(CancellationToken ct = default)
         {
             var Categories  = await _db.Categories.GetAll().ToListAsync(ct);
             var dtos  = _mapper.Map<IEnumerable<CategoryDTO>>(Categories); 

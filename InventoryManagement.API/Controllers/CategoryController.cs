@@ -33,10 +33,10 @@ namespace InventoryManagement.API.Controllers
                 return NotFound(result.ErrorMessage);
             return Ok(result.Data);
         }
-        [HttpGet]
-        public async Task<IActionResult> GetCategories( CancellationToken ct = default)
+        [HttpGet("lookUp")]
+        public async Task<IActionResult> GetCategoriesLookUp( CancellationToken ct = default)
         {
-            var result = await _service.GetCategoriesAsync(ct);
+            var result = await _service.GetCategoriesLookUpAsync(ct);
             return Ok(result.Data);
         }
         [HttpPut("{Id}")]

@@ -53,7 +53,7 @@
         await LoadData();
         Categories = await ProductHttpClient!.
         GetFromJsonAsync<IEnumerable<CategoryDTO>>
-        ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}") ; 
+        ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}/lookUp");
 
     }
     private async Task LoadData()
