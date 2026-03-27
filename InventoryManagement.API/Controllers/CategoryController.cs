@@ -39,10 +39,10 @@ namespace InventoryManagement.API.Controllers
             var result = await _service.GetCategoriesLookUpAsync(ct);
             return Ok(result.Data);
         }
-        [HttpGet()]
-        public async Task<IActionResult> GetCategories(CancellationToken ct = default)
+        [HttpGet]
+        public async Task<IActionResult> GetCategories(string? searchTerm = null, bool? active = null, CancellationToken ct = default)
         {
-            var result = await _service.GetCategoriesAsync(ct);
+            var result = await _service.GetCategoriesAsync(searchTerm , active ,  ct);
             return Ok(result.Data);
         }
         [HttpPut("{Id}")]

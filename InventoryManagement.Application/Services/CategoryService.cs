@@ -47,9 +47,29 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<IEnumerable<CategoryDTO>>> GetCategoriesLookUpAsync(CancellationToken ct = default)
         {
-            var Categories  = await _db.Categories.GetAll().ToListAsync(ct);
+            var Categories  = await _db.Categories.GetAll().Where(c=> c.IsActive).ToListAsync(ct);
             var dtos  = _mapper.Map<IEnumerable<CategoryDTO>>(Categories); 
             return Result <IEnumerable< CategoryDTO >>.Success(dtos);
+        }
+        public async Task<Result<IEnumerable<CategoryListDTO>>>
+            GetCategoriesAsync(string ? searchTerm = null , bool ? active = null , CancellationToken ct = default)
+        {
+            var CategoriesQuery =  _db.Categories.GetAll();
+            if (active != null)
+                CategoriesQuery = CategoriesQuery.Where(c => c.IsActive == active);
+            if (searchTerm != null)
+                CategoriesQuery = CategoriesQuery.Where(c => c.Name.Contains(searchTerm));
+          var Categories = await CategoriesQuery
+             .Select(c => new CategoryListDTO
+            {
+                Id = c.Id,  
+                Name = c.Name,  
+                UpdatedAt = c.UpdatedAt,
+                CreatedAt = c.CreatedAt,    
+                IsActive = c.IsActive,  
+                ProductsCount = c.Products.Count(),     
+            }).ToListAsync(ct);
+            return Result<IEnumerable<CategoryListDTO>>.Success(Categories);
         }
         public async Task <Result <string>> UpdateCategoryAsync (int id ,  CreateUpdateCategoryDto model , CancellationToken ct = default)
         {
