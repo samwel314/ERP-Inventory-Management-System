@@ -20,7 +20,7 @@ namespace InventoryManagement.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<Result<WarehouseDTO>> CreateCategoryAsync(CreateUpdateWarehouseDto model, CancellationToken ct = default)
+        public async Task<Result<WarehouseDTO>> CreateWarehouseAsync(CreateUpdateWarehouseDto model, CancellationToken ct = default)
         {
             var exist = await IsNameExist(model.Name.Trim(), model.City.Trim(), ct);
             if (exist)
