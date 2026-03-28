@@ -14,6 +14,7 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
         }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Warehouse> Warehouses { get; set; }        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -36,6 +37,11 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
             modelBuilder.Entity<Product>().Property(p => p.SellingPrice).IsRequired().HasPrecision(18, 2);
             modelBuilder.Entity<Product>().Property(p => p.PurchasePrice).IsRequired().HasPrecision(18 , 2);
             modelBuilder.Entity<Product>().Property(p => p.ImageUrl).IsRequired();
+
+            /// *-*-*-*-* Warehouse 
+            modelBuilder.Entity<Warehouse>().Property(c => c.Name).IsRequired().HasMaxLength(100);
+            modelBuilder.Entity<Warehouse>().Property(c => c.City).IsRequired().HasMaxLength(50);
+            modelBuilder.Entity<Warehouse>().Property(c => c.Address).HasMaxLength(150);
         }
     }
 }
