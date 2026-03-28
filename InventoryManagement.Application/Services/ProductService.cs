@@ -148,35 +148,51 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<string>> UpdateProductBasicInfoAsync(Guid Id, UpdateProductBasicInfoDTO dto, CancellationToken ct = default)
         {
-            // load product 
-            var product = await GetProductAsync(Id, ct); 
+            var product = await GetProductAsync(Id, ct );
             if (product == null)
                 return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
-            // Work with Category 
-            if (dto.CategoryId != null)
+
+            var finalCategoryId = dto.CategoryId ?? product.CategoryId;
+            var finalName = dto.Name?.Trim() ?? product.Name;
+
+            bool isCategoryChanged = dto.CategoryId != null && dto.CategoryId != product.CategoryId;
+            bool isNameChanged = dto.Name != null && !product.Name.Equals(dto.Name.Trim(), StringComparison.OrdinalIgnoreCase);
+
+            if (isCategoryChanged || isNameChanged)
             {
-                var categoryExist = await CategoryExist(dto.CategoryId.Value, ct);
+                var sameNameExist = await SameNameInCategoryExist(finalCategoryId, finalName, ct);
+                if (sameNameExist)
+                    return Result<string>.Failure("A product with this name already exists in the selected category.", ErrorType.Conflict);
+            }
+
+            if (isCategoryChanged)
+            {
+                var categoryExist = await CategoryExist(dto.CategoryId!.Value, ct);
                 if (!categoryExist)
-                    return Result<string>.Failure("This Category Not Found", ErrorType.NotFound);
+                    return Result<string>.Failure("Selected Category Not Found", ErrorType.NotFound);
+
                 product.ChangeCategory(dto.CategoryId.Value);
             }
-            // WORK with name
-            if (dto.Name != null) // my not pass a name 
+
+            if (isNameChanged)
             {
-                if (!product.Name.Equals(dto.Name.Trim(), StringComparison.OrdinalIgnoreCase)) // new name not equal to old name
-                {
-                    var sameNameExist = await SameNameInCategoryExist(product.CategoryId, dto.Name!, ct);
-                    if (sameNameExist)
-                        return Result<string>.Failure("You already have product with this name in the category ", ErrorType.Conflict);
-                    product.UpdateName(dto.Name.Trim().ToLower());
-                }
+                product.UpdateName(dto.Name!.Trim().ToLower());
             }
-            if (dto.Description != null && product.Description != dto.Description)
+
+            if (dto.Description != null && !string.Equals(product.Description, dto.Description.Trim()))
+            {
                 product.UpdateDescription(dto.Description.Trim());
-            if (dto.MinimumStock != null)
+            }
+
+            if (dto.MinimumStock != null && product.MinimumStock != dto.MinimumStock.Value)
+            {
                 product.UpdateMinimumStock(dto.MinimumStock.Value);
+            }
+
+        
             await _db.SaveChangesAsync(ct);
-            return Result<string>.Success();
+
+            return Result<string>.Success("Product updated successfully");
         }
         public async Task<Result<string>> UpdateProductPricingAsync(Guid Id, UpdateProductPricingDTO dto, CancellationToken ct = default)
         {
