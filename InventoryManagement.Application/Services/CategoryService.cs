@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using InventoryManagement.Application.DTO;
 using InventoryManagement.Application.Mapping;
 using InventoryManagement.Application.Persistence;
@@ -47,9 +48,9 @@ namespace InventoryManagement.Application.Services
         }
         public async Task<Result<IEnumerable<CategoryDTO>>> GetCategoriesLookUpAsync(CancellationToken ct = default)
         {
-            var Categories  = await _db.Categories.GetAll().Where(c=> c.IsActive).ToListAsync(ct);
-            var dtos  = _mapper.Map<IEnumerable<CategoryDTO>>(Categories); 
-            return Result <IEnumerable< CategoryDTO >>.Success(dtos);
+            var Categories  = await _db.Categories.GetAll().Where(c=> c.IsActive)
+                . ProjectTo<CategoryDTO>(_mapper.ConfigurationProvider).ToListAsync(ct);
+            return Result <IEnumerable<CategoryDTO>>.Success(Categories);
         }
         public async Task<Result<IEnumerable<CategoryListDTO>>>
             GetCategoriesAsync(string ? searchTerm = null , bool ? active = null , CancellationToken ct = default)
