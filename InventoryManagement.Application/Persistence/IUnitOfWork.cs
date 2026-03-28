@@ -8,7 +8,8 @@ namespace InventoryManagement.Application.Persistence
     public interface IUnitOfWork
     {
         ICategoryRepository Categories { get; }
-        IProductRepository Products { get; }        
+        IProductRepository Products { get; }
+        IWarehouseRepository Warehouses  { get; }
         Task SaveChangesAsync(CancellationToken ct );    
     }
 }

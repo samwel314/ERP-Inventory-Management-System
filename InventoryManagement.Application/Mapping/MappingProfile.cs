@@ -21,6 +21,11 @@ namespace InventoryManagement.Application.Mapping
                 ForMember(dest => dest.ProfitPerUnit, p => p.MapFrom(src => src.ProfitPerUnit()));
             CreateMap<Product, ProductListDTO>().
                 ForMember(dest => dest.CategoryName, p => p.MapFrom(src => src.Category.Name)); 
+           
+            CreateMap<Warehouse, WarehouseDTO>().
+                ForMember(dest => dest.NameWithCity, p => p.MapFrom(src => $"{src.Name}-({src.City})"));
+            CreateMap<Warehouse, WarehouseDetailsDTO>();
+
         }
     }
 }
