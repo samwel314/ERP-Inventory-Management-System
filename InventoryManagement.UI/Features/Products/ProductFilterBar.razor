@@ -83,7 +83,13 @@
     [Parameter, EditorRequired]
     public IEnumerable<CategoryDTO> categories { get; set; }
 
-
+    protected override void OnParametersSet()
+    {
+        if (ProductSearchFilter.IsActive != null)
+        {
+            IsActive = ProductSearchFilter.IsActive.Value ? "true" : "false";
+        }        
+    }
     private async Task OnApplyFilter ()
     {
         if (string.IsNullOrEmpty(IsActive))
