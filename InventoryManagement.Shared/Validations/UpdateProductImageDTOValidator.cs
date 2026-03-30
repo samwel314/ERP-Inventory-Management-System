@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using InventoryManagement.Application.DTO;
+using InventoryManagement.Shared.DTO;
 
-namespace InventoryManagement.Application.Validations
+namespace InventoryManagement.Shared.Validations
 {
     public class UpdateProductImageDTOValidator : AbstractValidator<UpdateProductImageDTO>
     {

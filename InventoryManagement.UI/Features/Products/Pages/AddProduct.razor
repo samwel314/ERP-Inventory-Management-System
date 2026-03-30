@@ -8,89 +8,91 @@
             <button class="btn btn-primary px-5 shadow">Save Product</button>
         </div>
     </div>
+    <EditForm>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="oi oi-info me-2"></i> General Information</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label small fw-bold">Product Name *</label>
+                                <input type="text" class="form-control" placeholder="e.g. iPhone 15 Pro Max" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Category *</label>
+                                <select class="form-select">
+                                    <option selected disabled>Select Category</option>
+                                    <option>Electronics</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label small fw-bold">Brand (Optional)</label>
+                                <input type="text" class="form-control" placeholder="e.g. Apple" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-info me-2"></i> General Information</div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label small fw-bold">Product Name *</label>
-                            <input type="text" class="form-control" placeholder="e.g. iPhone 15 Pro Max" />
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">Category *</label>
-                            <select class="form-select">
-                                <option selected disabled>Select Category</option>
-                                <option>Electronics</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">Brand (Optional)</label>
-                            <input type="text" class="form-control" placeholder="e.g. Apple" />
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="oi oi-dollar me-2"></i> Pricing & Tax</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label small fw-bold">Cost Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label small fw-bold">Selling Price *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label small fw-bold">Tax Percentage (%)</label>
+                                <input type="number" class="form-control" value="14" />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-dollar me-2"></i> Pricing & Tax</div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label small fw-bold">Cost Price</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" placeholder="0.00" />
-                            </div>
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white fw-bold"><i class="oi oi-barcode me-2"></i> Stock & SKU</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">SKU Code</label>
+                            <input type="text" class="form-control bg-light" placeholder="Auto-generated or Manual" />
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label small fw-bold">Selling Price *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" placeholder="0.00" />
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Initial Quantity</label>
+                            <input type="number" class="form-control border-primary" placeholder="0" />
+                            <div class="form-text small text-primary">This will create the first stock movement.</div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label small fw-bold">Tax Percentage (%)</label>
-                            <input type="number" class="form-control" value="14" />
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Minimum Alert Level</label>
+                            <input type="number" class="form-control border-warning" placeholder="5" />
                         </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white fw-bold"><i class="oi oi-image me-2"></i> Product Image</div>
+                    <div class="card-body text-center py-4">
+                        <div class="border border-2 border-dashed rounded p-4 mb-2">
+                            <i class="oi oi-cloud-upload fs-1 text-muted"></i>
+                            <p class="small text-muted mt-2">Click to upload or drag image</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary">Choose File</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-barcode me-2"></i> Stock & SKU</div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">SKU Code</label>
-                        <input type="text" class="form-control bg-light" placeholder="Auto-generated or Manual" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Initial Quantity</label>
-                        <input type="number" class="form-control border-primary" placeholder="0" />
-                        <div class="form-text small text-primary">This will create the first stock movement.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Minimum Alert Level</label>
-                        <input type="number" class="form-control border-warning" placeholder="5" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-image me-2"></i> Product Image</div>
-                <div class="card-body text-center py-4">
-                    <div class="border border-2 border-dashed rounded p-4 mb-2">
-                        <i class="oi oi-cloud-upload fs-1 text-muted"></i>
-                        <p class="small text-muted mt-2">Click to upload or drag image</p>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary">Choose File</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </EditForm>
 </div>

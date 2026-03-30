@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using InventoryManagement.Application.DTO;
+using InventoryManagement.Shared.DTO;
 
 namespace InventoryManagement.Application.Validations
 {

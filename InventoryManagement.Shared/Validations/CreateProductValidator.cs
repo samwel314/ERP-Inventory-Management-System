@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
-using InventoryManagement.Application.DTO;
+using InventoryManagement.Shared.DTO;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace InventoryManagement.Application.Validations
+namespace InventoryManagement.Shared.Validations
 {
     public class CreateProductValidator : AbstractValidator<CreateProductDTO>
     {

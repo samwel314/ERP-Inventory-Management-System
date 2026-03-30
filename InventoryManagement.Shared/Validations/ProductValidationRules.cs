@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
-
-namespace InventoryManagement.Application.Validations
+namespace InventoryManagement.Shared.Validations
 {
     public static class ProductValidationRules
     {

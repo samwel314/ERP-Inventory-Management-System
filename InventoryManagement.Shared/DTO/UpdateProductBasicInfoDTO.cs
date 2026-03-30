@@ -1,4 +1,4 @@
-﻿namespace InventoryManagement.Application.DTO
+﻿namespace InventoryManagement.Shared.DTO
 {
     public class UpdateProductBasicInfoDTO
     {

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using InventoryManagement.Application.DTO;
+using InventoryManagement.Shared.DTO;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Domain.Entities;
 using InventoryManagement.Shared.DTO;

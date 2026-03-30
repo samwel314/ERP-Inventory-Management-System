@@ -1,4 +1,4 @@
-﻿using InventoryManagement.Application.DTO;
+﻿using InventoryManagement.Shared.DTO;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
 using Microsoft.AspNetCore.Mvc;

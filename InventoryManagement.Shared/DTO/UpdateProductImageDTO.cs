@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace InventoryManagement.Application.DTO
+namespace InventoryManagement.Shared.DTO
 {
     public class UpdateProductImageDTO
     {
