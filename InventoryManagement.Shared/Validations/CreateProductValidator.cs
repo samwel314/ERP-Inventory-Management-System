@@ -20,7 +20,7 @@ namespace InventoryManagement.Shared.Validations
             RuleFor(m => m.SellingPrice).ValidSellingPrice();   
             RuleFor(m => m.PurchasePrice).ValidPurchasePrice();
             RuleFor(m => m.CategoryId).ValidCategoryId();   
-            RuleFor(m => m.Image).ValidImage(); 
+           // RuleFor(m => m.Image).ValidImage(); 
         }
     }
 }
