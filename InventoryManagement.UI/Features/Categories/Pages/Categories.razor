@@ -4,7 +4,6 @@
         <h3 class="fw-bold mb-0">Categories Management</h3>
         <p class="text-muted small">Organize your products by sections</p>
     </div>
-
     <div class="col-md-5">
         <div class="input-group shadow-sm">
             <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
@@ -24,21 +23,75 @@
         </button>
     </div>
     <div class="col-md-3 text-md-end">
-        <button class="btn btn-primary shadow-sm px-4" @* @onclick="OpenAddModal *@">
+        <button class="btn btn-primary shadow-sm px-4" @onclick="OpenAddModal">
             <i class="bi bi-plus-lg me-2"></i>New Category
         </button>
     </div>
 </div>
-<CategoryGrid Categories="categories" OnDelete="Delete" OnEdit="Edit" OnToggleStatus="ChangeStatus"/>
+<CategoryGrid Categories="categories" OnDelete="Delete" OnEdit="Edit" OnToggleStatus="ChangeStatus" />
+
+@if (isAddMode)
+{
+    <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <EditForm Model="newCategory" OnValidSubmit="HandleAddCategory">
+                    <DataAnnotationsValidator />
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="fw-bold"><i class="bi bi-tag-fill me-2 text-primary"></i>@(isEditMode ? $"Update Category" : "Add New Category") </h5>
+                        <button type="button" class="btn-close" @onclick="CloseAddModal"></button>
+                    </div>
+
+                    <div class="modal-body py-4">
+                        @if (!string.IsNullOrEmpty(modalErrorMessage))
+                        {
+                            <div class="alert alert-danger border-0 small rounded-3 mb-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i> @modalErrorMessage
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Category Name</label>
+                            <InputText @bind-Value="newCategory.Name" class="form-control form-control-lg bg-light border-0 shadow-none" placeholder="e.g. Electronics, Furniture..." />
+                            <ValidationMessage For="@(() => newCategory.Name)" class="text-danger small mt-1" />
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light px-4 rounded-3 text-muted fw-bold" @onclick="CloseAddModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-5 rounded-3 fw-bold shadow-sm">Save Category</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
 @code
 {
-    string status = ""; 
-    private CategorySearchFilter categorySearchFilter = new() ; 
+    string status = "";
+    private CategorySearchFilter categorySearchFilter = new();
     [Inject]
     public HttpClient? CategoryHttpClient { get; set; }
-    private IEnumerable<CategoryListDTO> ?categories ; 
+    private IEnumerable<CategoryListDTO>? categories;
+    private bool isAddMode = false;
+    private CreateUpdateCategoryDto newCategory = new();
+    private string? modalErrorMessage;
+    private bool isEditMode = false;
 
-    private async Task  ApplyFilter()
+    private async Task Edit(CategoryListDTO category)
+    {
+        newCategory = new CreateUpdateCategoryDto
+        {
+            Name = category.Name,
+            CategoryId = category.Id
+        };
+
+        isEditMode = true;
+        isAddMode = true;
+    }
+    private async Task ApplyFilter()
     {
         if (!string.IsNullOrEmpty(status))
         {
@@ -46,15 +99,16 @@
         }
         else
         {
-            categorySearchFilter.IsActive = null; 
+            categorySearchFilter.IsActive = null;
         }
-        await LoadData(); 
+        await LoadData();
     }
+
     private async Task LoadData()
     {
         List<string> query = new List<string>();
-    
-        if (categorySearchFilter.SearchTerm != null )
+
+        if (categorySearchFilter.SearchTerm != null)
             query.Add($"searchTerm={categorySearchFilter.SearchTerm}");
         if (categorySearchFilter.IsActive != null)
             query.Add($"active={categorySearchFilter.IsActive}");
@@ -66,33 +120,12 @@
        GetFromJsonAsync<IEnumerable<CategoryListDTO>>
        ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}?{fullQuery}");
     }
-    
+
     protected override async Task OnInitializedAsync()
     {
-        await LoadData() ; 
+        await LoadData();
     }
-    private async Task ChangeStatus(CategoryListDTO  category)
-    {
-        var url = $"{UrlsPath.BaseUrl}{UrlsPath.Categories}";
-        if (category.IsActive)
-            url = url + $"/{category.Id}/deactivate";
-        else
-            url = url + $"/{category.Id}/activate";
-
-        var response = await CategoryHttpClient!.PutAsync(url, null);
-
-        if (response.IsSuccessStatusCode)
-        {
-            // عشان ال browser يعدل ف ram 
-            category.IsActive = !category.IsActive;
-            Console.WriteLine($"category {category.Name} is now {(category.IsActive ? "Active" : "Deactivated")}");
-        }
-        else
-        {
-            Console.WriteLine("Error updating status");
-        }
-    }
-    private async Task Edit(CategoryListDTO category)
+    private async Task ChangeStatus(CategoryListDTO category)
     {
         var url = $"{UrlsPath.BaseUrl}{UrlsPath.Categories}";
         if (category.IsActive)
@@ -134,5 +167,41 @@
             Console.WriteLine("Error updating status");
         }
     }
+    private async Task HandleAddCategory()
+    {
+        HttpResponseMessage response;
+        modalErrorMessage = null;
+        if (isEditMode)
+        {
+            response = await CategoryHttpClient!.PutAsJsonAsync($"{UrlsPath.BaseUrl}{UrlsPath.Categories}/{newCategory.CategoryId}", newCategory);
+        }
+        else
+        {
+            response = await CategoryHttpClient!.PostAsJsonAsync($"{UrlsPath.BaseUrl}{UrlsPath.Categories}", newCategory);
+        }
 
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadData();
+            CloseAddModal();
+            Console.WriteLine("Category Added Successfully");
+        }
+        else
+        {
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            modalErrorMessage = error?.Message ?? "Failed to save category.";
+        }
+    }
+    private void CloseAddModal()
+    {
+        isAddMode = false;
+        isEditMode = false;
+        modalErrorMessage = null ; 
+    }
+    private void OpenAddModal()
+    {
+        newCategory = new(); // Reset
+        modalErrorMessage = null;
+        isAddMode = true;
+    }
 }
