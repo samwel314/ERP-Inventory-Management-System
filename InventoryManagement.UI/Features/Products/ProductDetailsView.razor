@@ -2,7 +2,7 @@
 {
     <div class="card border-0 shadow-sm">
         <div class="text-center bg-light p-4 rounded mb-3">
-            <img src="@Product.ImageUrl" class="img-fluid rounded shadow-sm" style="max-height: 200px;" alt="@Product.Name">
+            <img src="@(UrlsPath.Host+@Product.ImageUrl)" class="img-fluid rounded shadow-sm" style="max-height: 200px;" alt="@Product.Name">
             <h4 class="mt-3 mb-1 fw-bold text-primary">@Product.Name</h4>
             <span class="badge @(Product.IsActive ? "bg-success" : "bg-secondary")">
                 @(Product.IsActive ? "Active" : "Archived")
