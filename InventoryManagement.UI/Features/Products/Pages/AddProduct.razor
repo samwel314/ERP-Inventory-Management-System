@@ -1,6 +1,6 @@
 ﻿@page "/products/add"
 
-<EditForm Model="_product" OnValidSubmit="SubmitForm">
+<EditForm  EditContext="_editContext" OnValidSubmit="SubmitForm">
     <FluentValidationValidator />
     <div class="container py-4">
 
@@ -160,9 +160,7 @@
                     <div class="upload-area border border-2 border-dashed rounded-4 p-4 text-center bg-light mb-3">
                         <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
                         <p class="small fw-bold text-dark mt-2 mb-1">Click to Upload Product Image</p>
-    
                         <InputFile OnChange="HandleFileSelected" class="form-control form-control-sm" />
-    
                         <ValidationMessage For="@(() => _product.Image)" class="text-danger small mt-1" />
                     </div>
                 </div>
@@ -175,8 +173,9 @@
 {
     [Inject]
     public HttpClient productClient { get; set; } = null!;
-    private CreateProductDTO _product = new () ; 
+    private CreateProductUiDto _product = new();
     private IEnumerable<CategoryDTO>? Categories;
+    private EditContext _editContext = default!;
 
     private bool showSuccess = false ; 
     private string ? errorMessage {get ;set ; } 
@@ -194,11 +193,11 @@
         content.Add(new StringContent(_product.MinimumStock.ToString()), "MinimumStock");
         content.Add(new StringContent(_product.CategoryId.ToString()), "CategoryId");
 
-        if (selectedFile != null)
+        if (_product.Image != null)
         {
-            var fileContent = new StreamContent(selectedFile.OpenReadStream(2000000));
-            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(selectedFile.ContentType);
-            content.Add(fileContent, "Image", selectedFile.Name);
+            var fileContent = new StreamContent(_product.Image.OpenReadStream(_product.Image.Size));
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(_product.Image.ContentType);
+            content.Add(fileContent, "Image", _product.Image.Name);
         }
         var response = await productClient.PostAsync
         ($"{UrlsPath.BaseUrl}{UrlsPath.Products}", content);
@@ -210,9 +209,11 @@
         else
         {
             showSuccess = true;
-            _product = new();
-            selectedFile = null ; 
+            _product = new() ; 
+            _editContext = new EditContext(_product);
+            _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
         }
+
     }
 
     private void Reset ()
@@ -220,19 +221,21 @@
         _product = new() ; 
         showSuccess = false ; 
         errorMessage = null ; 
+        _editContext = new EditContext(_product);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
     }
     
     protected override async Task OnInitializedAsync()
     {
+        _editContext = new EditContext(_product);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
         Categories = await productClient!.
             GetFromJsonAsync<IEnumerable<CategoryDTO>>
             ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}/lookUp");
     }
-    private string? imagePreviewUrl;
-    private IBrowserFile? selectedFile;
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        selectedFile = e.File;
-
+         _product.Image = e.File;
+        _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _product.Image));
     }
 }

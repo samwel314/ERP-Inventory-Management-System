@@ -6,7 +6,7 @@ using System.Text;
 
 namespace InventoryManagement.Shared.DTO
 {
-    public class CreateProductDTO
+    public class CreateProductBaseDTO
     {
         public string ? Name { get;  set; } = null!;
         public string? Description { get;  set; }
@@ -15,6 +15,5 @@ namespace InventoryManagement.Shared.DTO
         public decimal SellingPrice { get;  set; }
         public decimal PurchasePrice { get;  set; }
         public int CategoryId { get;  set; }
-        public IFormFile ? Image { get;  set; } = null!;
     }
 }

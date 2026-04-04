@@ -1,6 +1,7 @@
-﻿using InventoryManagement.Shared.DTO;
+﻿using InventoryManagement.Application.DTOS;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
+using InventoryManagement.Shared.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 
@@ -20,7 +21,7 @@ namespace InventoryManagement.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create( CreateProductDTO dto, CancellationToken ct = default)
+        public async Task<IActionResult> Create(CreateProductApiDto dto, CancellationToken ct = default)
         {
             var result = await _productService.CreateProductAsync(dto, ct);
             if (!result.IsSuccess)
@@ -103,7 +104,7 @@ namespace InventoryManagement.API.Controllers
             return NoContent();
         }
         [HttpPatch("{id}/image")]
-        public async Task<IActionResult> UpdateProductImage(Guid id, UpdateProductImageDTO dto, CancellationToken ct = default)
+        public async Task<IActionResult> UpdateProductImage(Guid id, UpdateProductImageApiDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductImageAsync(id, dto, ct);
             if (!result.IsSuccess)

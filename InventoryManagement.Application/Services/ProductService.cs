@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using InventoryManagement.Application.DTOS;
 using InventoryManagement.Application.Persistence;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Domain.Entities;
@@ -31,7 +32,7 @@ namespace InventoryManagement.Application.Services
             _webenvironment = webenvironment;
         }
         // Create 
-        public async Task<Result<ProductDetailsDTO>> CreateProductAsync(CreateProductDTO dto, CancellationToken ct)
+        public async Task<Result<ProductDetailsDTO>> CreateProductAsync(CreateProductApiDto dto, CancellationToken ct)
         {
             // check category 404 
             var categoryExist = await CategoryExist(dto.CategoryId, ct);
@@ -79,7 +80,7 @@ namespace InventoryManagement.Application.Services
         {
             return await _db.Products.GetAll().
                 AnyAsync
-                (p => p.SKU == Skd, ct);
+                (p => p.SKU == Skd.Trim(), ct);
         }
         private async Task<string> SaveImageAsync(IFormFile image)
         {
@@ -221,7 +222,7 @@ namespace InventoryManagement.Application.Services
             return Result<string>.Success();
         }
 
-        public async Task <Result<string>> UpdateProductImageAsync (Guid Id, UpdateProductImageDTO dto, CancellationToken ct = default)
+        public async Task <Result<string>> UpdateProductImageAsync (Guid Id, UpdateProductImageApiDTO dto, CancellationToken ct = default)
         {
             var product = await GetProductAsync(Id, ct);
             if (product == null)

@@ -5,7 +5,7 @@ namespace InventoryManagement.Shared.Validations
     public static class ProductValidationRules
     {
 
-        static readonly List<string> Allows = new List<string>()
+        public static readonly List<string> Allows = new List<string>()
         {
             ".jpg" ,
             ".png" ,
@@ -42,9 +42,6 @@ namespace InventoryManagement.Shared.Validations
         {
             return rule.GreaterThan(0).WithMessage("Invalid category id ");
         }
-        public static IRuleBuilderOptions<T , IFormFile?> ValidImage <T> (this IRuleBuilder <T , IFormFile?> rule)
-        {
-            return rule.NotNull().Must(i => i != null && Allows.Any(a => a == Path.GetExtension(i.FileName).ToLower())).WithMessage("allows types .jpg , .png");
-        }
+
     }
 }

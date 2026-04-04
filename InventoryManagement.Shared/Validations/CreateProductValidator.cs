@@ -8,11 +8,10 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace InventoryManagement.Shared.Validations
 {
-    public class CreateProductValidator : AbstractValidator<CreateProductDTO>
+    public class CreateProductValidator : AbstractValidator<CreateProductBaseDTO>
     {
         public CreateProductValidator()
         {
-            // اي LOGIC هيكون هنا هنا 
             RuleFor(m => m.Name).ValidName(); 
             RuleFor(m => m.Description).ValidDescription();
             RuleFor(m => m.SKU).ValidSKU();
@@ -20,7 +19,6 @@ namespace InventoryManagement.Shared.Validations
             RuleFor(m => m.SellingPrice).ValidSellingPrice();   
             RuleFor(m => m.PurchasePrice).ValidPurchasePrice();
             RuleFor(m => m.CategoryId).ValidCategoryId();   
-           // RuleFor(m => m.Image).ValidImage(); 
         }
     }
 }
