@@ -1,5 +1,16 @@
 ﻿@page "/products"
 <div class="container-fluid p-4 bg-light min-vh-100">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center mb-4 p-3 animate__animated animate__fadeIn">
+            <i class="bi bi-exclamation-octagon-fill fs-4 me-3"></i>
+            <div>
+                <div class="fw-bold text-uppercase small">Submission Failed</div>
+                <div class="small text-secondary-emphasis">@errorMessage</div>
+            </div>
+            <button type="button" class="btn-close ms-auto" @onclick="() => errorMessage = null" aria-label="Close"></button>
+        </div>
+    }
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="fw-bold text-navy">Inventory Management</h3>
         <a href="/products/add" class="btn btn-primary shadow-sm px-4">
@@ -9,11 +20,11 @@
 
     <ProductSummaryCards />
 
-    <ProductFilterBar  categories="Categories"  ProductSearchFilter="productSearchFilter"   />
+    <ProductFilterBar categories="Categories" ProductSearchFilter="productSearchFilter" />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-            <ProductDataGrid products="products" ChangeStatus="ChangeStatus" OnViewDetails="LoadSelectedProduct" />
+            <ProductDataGrid products="products" ChangeStatus="ChangeStatus" OnViewDetails="LoadSelectedProduct" ChangeImage="ChangeImage" />
         </div>
     </div>
 </div>
@@ -37,6 +48,11 @@
 </div>
 @* <PricingUpdateModal /> *@
 @* <SkuUpdateModal /> *@
+
+@if (updateImageModalOpen)
+{
+    <ImageUpdateCell product="productToUpdate" Cancel="CancelUpdateImage" ChangeImage="HandleChangeImage" />
+}
 @code
 {
     [Parameter, SupplyParameterFromQuery] public string? SearchTerm { get; set; }
@@ -50,10 +66,12 @@
     private ProductSearchFilter productSearchFilter = new();
     private PagedResult<ProductListDTO>? pagedResult;
     private IEnumerable<ProductListDTO>? products;
-    private IEnumerable<CategoryDTO> ? Categories  ; 
-    private ProductDetailsDTO ?selectedProduct ; 
-    private bool isPanelOpen = false ; 
-    private bool isLoadingDetails = true ; 
+    private IEnumerable<CategoryDTO>? Categories;
+    private ProductDetailsDTO? selectedProduct;
+    private ProductListDTO? productToUpdate;
+    private bool isPanelOpen = false;
+    private bool isLoadingDetails = true;
+    private bool updateImageModalOpen = false;
     protected override async Task OnInitializedAsync()
     {
         Categories = await ProductHttpClient!.
@@ -62,12 +80,12 @@
     }
     protected override async Task OnParametersSetAsync()
     {
-        productSearchFilter.CategoryId = CategoryId ; 
-        productSearchFilter.IsActive = IsActive ; 
-        productSearchFilter.SearchTerm = SearchTerm ; 
+        productSearchFilter.CategoryId = CategoryId;
+        productSearchFilter.IsActive = IsActive;
+        productSearchFilter.SearchTerm = SearchTerm;
         productSearchFilter.PageNumber = PageNumber > 0 ? PageNumber : 1;
         productSearchFilter.PageSize = PageSize > 0 ? PageSize : 5;
-        await LoadData() ; 
+        await LoadData();
     }
     private async Task LoadData()
     {
@@ -89,7 +107,7 @@
         {
             query.Add($"active={productSearchFilter.IsActive}");
         }
-        var fullQuery = string.Join("&" , query) ;
+        var fullQuery = string.Join("&", query);
         Console.WriteLine(fullQuery);
         pagedResult =
         await ProductHttpClient!.
@@ -112,7 +130,7 @@
         else
             url = url + $"/{product.Id}/activate";
 
-        var response = await ProductHttpClient!.PutAsync(url ,  null);
+        var response = await ProductHttpClient!.PutAsync(url, null);
 
         if (response.IsSuccessStatusCode)
         {
@@ -124,22 +142,59 @@
             Console.WriteLine("Error updating status");
         }
     }
-
-    private void ClosePanel ()
+    private string? errorMessage = null;
+    private void ClosePanel()
     {
-        isPanelOpen = false ; 
-        isLoadingDetails = true ; 
+        isPanelOpen = false;
+        isLoadingDetails = true;
     }
 
-    private async Task LoadSelectedProduct (ProductListDTO product)
+    private async Task LoadSelectedProduct(ProductListDTO product)
     {
         isPanelOpen = true;
         if (selectedProduct == null || selectedProduct.Id != product.Id)
         {
-            isLoadingDetails = true ; 
+            isLoadingDetails = true;
             selectedProduct = await ProductHttpClient!.GetFromJsonAsync<ProductDetailsDTO>
               ($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{product.Id}");
         }
-        isLoadingDetails = false ; 
+        isLoadingDetails = false;
+    }
+    private async Task ChangeImage(ProductListDTO product)
+    {
+        productToUpdate = product;
+        updateImageModalOpen = true;
+    }
+    private async Task CancelUpdateImage()
+    {
+        productToUpdate = null!;
+        updateImageModalOpen = false;
+    }
+    private async Task HandleChangeImage(UpdateProductImageUiDTO product)
+    {
+        var url = $"{UrlsPath.BaseUrl}{UrlsPath.Products}";
+        using var content = new MultipartFormDataContent();
+
+        if (product.Image != null)
+        {
+            var fileContent = new StreamContent(product.Image.OpenReadStream(product.Image.Size));
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(product.Image.ContentType);
+            content.Add(fileContent, "Image", product.Image.Name);
+        }
+        var response = await ProductHttpClient!.
+        PutAsync($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{product.Id}/image", content);
+        if (response.IsSuccessStatusCode)
+        {
+            errorMessage = null;
+            Console.WriteLine($"Product {product.Id} image updated successfully");
+            updateImageModalOpen = false;
+            await LoadData();
+        }
+        else
+        {
+            Console.WriteLine("Error updating image");
+            errorMessage = "Error updating status";
+            updateImageModalOpen = false;
+        }
     }
 }

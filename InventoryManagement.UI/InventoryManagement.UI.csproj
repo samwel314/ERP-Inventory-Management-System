@@ -17,4 +17,8 @@
 		<ProjectReference Include="..\InventoryManagement.Shared\InventoryManagement.Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Features\Products\a\" />
+	</ItemGroup>
+
 </Project>

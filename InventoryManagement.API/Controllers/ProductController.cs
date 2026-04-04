@@ -103,7 +103,7 @@ namespace InventoryManagement.API.Controllers
             }
             return NoContent();
         }
-        [HttpPatch("{id}/image")]
+        [HttpPut("{id}/image")]
         public async Task<IActionResult> UpdateProductImage(Guid id, UpdateProductImageApiDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductImageAsync(id, dto, ct);

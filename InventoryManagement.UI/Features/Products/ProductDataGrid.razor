@@ -43,10 +43,8 @@
                 <tr>
                     <td class="ps-3">
                         <div class="d-flex align-items-center">
-                            <div class="position-relative me-3 group" style="cursor:pointer" title="Update Image">
-                                @{
-                                    Console.WriteLine(UrlsPath.Host + product.ImageUrl);
-                                }
+                            <div class="position-relative me-3 group" @onclick="() => ChangeImage.InvokeAsync(product)" 
+                                style="cursor:pointer" title="Update Image">
                                 <img src="@(UrlsPath.Host + product.ImageUrl)" class="rounded-2 border" style="width:45px; height:45px;" />
                                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25 rounded-2 opacity-0 hover-opacity-100 transition-sm">
                                     <i class="oi oi-camera text-white small"></i>
@@ -92,12 +90,6 @@
                                         @onclick="() => OnViewDetails.InvokeAsync(product)">
                                     <i class="bi bi-eye text-primary"></i> View
                                 </button>
-                        
-                                @* اختياري: زرار المسح *@
-                                <button class="btn btn-sm btn-light border text-danger"
-                                        title="Delete Product">
-                                    <i class="bi bi-trash"></i>
-                                </button>
                             </div>
                         </td>
 
@@ -115,5 +107,7 @@
     public EventCallback<ProductListDTO> ChangeStatus { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<ProductListDTO> OnViewDetails { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<ProductListDTO> ChangeImage { get; set; }
 
 }
