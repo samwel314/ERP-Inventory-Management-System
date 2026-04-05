@@ -27,7 +27,8 @@
             <ProductDataGrid products="products"
                 ChangeBasicInfo="ChangeBasicInfoLoad"
                 ChangeStatus="ChangeStatus" OnViewDetails="ViewProduct" 
-                             ChangeImage="ChangeImage" ChangePrice="ChangePricingLoad" />
+                             ChangeImage="ChangeImage" ChangePrice="ChangePricingLoad"
+                             ChangeSku="ChangeSKU" />
         </div>
     </div>
 </div>
@@ -64,6 +65,10 @@
 {
     <PricingUpdateModal OnCancel="CancelUpdatePrice" OnSave="HandleChangePricing" Product="selectedProduct" />
 }
+@if (updateSku)
+{
+    <SkuUpdateModal OnCancel="CancelUpdateSku" OnSave="HandleChangeSKU" Product="productToUpdate" />
+}
 @code
 {
     [Parameter, SupplyParameterFromQuery] public string? SearchTerm { get; set; }
@@ -85,6 +90,7 @@
     private bool updateImageModalOpen = false;
     private bool updateProductBasicInfo = false;    
     private bool updateProductPrice = false;
+    private bool updateSku = false;
     protected override async Task OnInitializedAsync()
     {
         Categories = await ProductHttpClient!.
@@ -173,6 +179,11 @@
         productToUpdate = product;
         updateImageModalOpen = true;
     }
+    private async Task ChangeSKU(ProductListDTO product)
+    {
+        productToUpdate = product;
+        updateSku = true;
+    }
 
     private async Task CancelUpdateImage()
     {
@@ -187,6 +198,10 @@
     private void CancelUpdatePrice()
     {
         updateProductPrice = false;
+    }
+    private void CancelUpdateSku()
+    {
+        updateSku = false;
     }
     private async Task HandleChangeImage(UpdateProductImageUiDTO product)
     {
@@ -266,7 +281,7 @@
             errorMessage = error?.Message ?? "Error ! Try Later .";
             updateProductPrice = false;
         }
-        
+
     }
 
     private async Task LoadSelectedProduct(Guid  productId)
@@ -276,6 +291,26 @@
             isLoadingDetails = true;
             selectedProduct = await ProductHttpClient!.GetFromJsonAsync<ProductDetailsDTO>
               ($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{productId}");
+        }
+    }
+    private async Task HandleChangeSKU(UpdateProductSKUDTO product)
+    {
+        var url = $"{UrlsPath.BaseUrl}{UrlsPath.Products}";
+        var response = await ProductHttpClient!.
+        PutAsJsonAsync($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{product.Id}/sku", product);
+        if (response.IsSuccessStatusCode)
+        {
+            errorMessage = null;
+            Console.WriteLine($"Product {product.Id} sku updated successfully");
+            updateSku = false;
+            await LoadData();
+        }
+        else
+        {
+            Console.WriteLine("Error updating sku ");
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            errorMessage = error?.Message ?? "Error ! Try Later .";
+            updateSku = false;
         }
     }
 }

@@ -38,13 +38,13 @@
         }
         else
         {
-            foreach (var  product in products)
+            foreach (var product in products)
             {
                 <tr>
                     <td class="ps-3">
                         <div class="d-flex align-items-center">
-                            <div class="position-relative me-3 group" @onclick="() => ChangeImage.InvokeAsync(product)" 
-                                style="cursor:pointer" title="Update Image">
+                            <div class="position-relative me-3 group" @onclick="() => ChangeImage.InvokeAsync(product)"
+                                 style="cursor:pointer" title="Update Image">
                                 <img src="@(UrlsPath.Host + product.ImageUrl)" class="rounded-2 border" style="width:45px; height:45px;" />
                                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-25 rounded-2 opacity-0 hover-opacity-100 transition-sm">
                                     <i class="oi oi-camera text-white small"></i>
@@ -67,28 +67,25 @@
                     <td>
                         <div class="form-check form-switch">
                             <input class="form-check-input" @onchange="() => ChangeStatus.InvokeAsync(product)" type="checkbox" checked="@product.IsActive" role="switch">
-                            <small class="text-muted px-1">@(product.IsActive ? "Active" : "Not Active") </small>
-                        </div>
-                    </td>
+                                <small class="text-muted px-1">@(product.IsActive ? "Active" : "Not Active") </small>
+                            </div>
+                        </td>
                         <td class="text-end pe-3">
-                            <div class="btn-group shadow-sm bg-white border rounded p-1">
+                            <div class="d-flex justify-content-end gap-2">
         
-                                <button class="btn btn-sm btn-light border-0 text-primary px-2"
-                                        title="Edit Basic Info"
+                                <button class="btn btn-outline-primary border-0 bg-primary bg-opacity-10 rounded-pill px-3 btn-sm fw-bold d-inline-flex align-items-center shadow-none"
                                         @onclick="() => ChangeBasicInfo.InvokeAsync(product)">
-                                    <i class="oi oi-pencil"></i>
+                                    <i class="oi oi-pencil me-2 small"></i> Info
                                 </button>
 
-                                <button class="btn btn-sm btn-light border-0 text-success px-2 border-start"
-                                        title="Pricing & Profit"
+                                <button class="btn btn-outline-success border-0 bg-success bg-opacity-10 rounded-pill px-3 btn-sm fw-bold d-inline-flex align-items-center shadow-none"
                                         @onclick="() => ChangePrice.InvokeAsync(product)">
-                                    <i class="oi oi-dollar"></i>
+                                    <i class="oi oi-dollar me-2 small"></i> Price
                                 </button>
 
-                                <button class="btn btn-sm btn-light border-0 text-secondary px-2 border-start"
-                                        title="Stock & SKU"
-                                      @*   @onclick="() => OpenSkuModal(product) *@">
-                                    <i class="oi oi-barcode"></i>
+                                <button class="btn btn-outline-secondary border-0 bg-secondary bg-opacity-10 rounded-pill px-3 btn-sm fw-bold d-inline-flex align-items-center shadow-none"
+                                        @onclick="() => ChangeSku.InvokeAsync(product)">
+                                    <i class="oi oi-barcode me-2 small"></i> SKU
                                 </button>
 
                             </div>
@@ -103,15 +100,15 @@
                             </div>
                         </td>
 
-                </tr>
+                    </tr>
 
+                }
             }
-        }
-    </tbody>
-</table>
-@code{
+        </tbody>
+    </table>
+@code {
 
-    [Parameter , EditorRequired ]
+    [Parameter, EditorRequired]
     public IEnumerable<ProductListDTO> products { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<ProductListDTO> ChangeStatus { get; set; }
@@ -123,4 +120,6 @@
     public EventCallback<ProductListDTO> ChangeBasicInfo { get; set; }
     [Parameter, EditorRequired]
     public EventCallback<ProductListDTO> ChangePrice { get; set; }
+    [Parameter, EditorRequired]
+    public EventCallback<ProductListDTO> ChangeSku { get; set; }
 }

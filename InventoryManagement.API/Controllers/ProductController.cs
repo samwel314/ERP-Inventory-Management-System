@@ -87,7 +87,7 @@ namespace InventoryManagement.API.Controllers
                 return NotFound(new { message = result.ErrorMessage }); 
             return NoContent();
         }
-        [HttpPatch("{id}/sku")]
+        [HttpPut("{id}/sku")]
         public async Task<IActionResult> UpdateProductSKUInfo(Guid id, UpdateProductSKUDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductSKUAsync(id, dto, ct);
