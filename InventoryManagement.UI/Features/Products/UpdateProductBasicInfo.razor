@@ -1,0 +1,94 @@
+﻿<div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
+     style="z-index: 1060;" @onclick="OnCancel">
+    
+    <div class="card shadow-lg border-0 bg-white rounded-4 animate__animated animate__fadeIn"
+         style="width: 100%; max-width: 550px;" @onclick:stopPropagation>
+                <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="mb-0 fw-bold"><i class="oi oi-pencil me-2"></i> Edit Basic Information</h5>
+            <button type="button" class="btn-close btn-close-white" @onclick="OnCancel"></button>
+        </div>
+
+        <div class="card-body p-4">
+            <EditForm Model="updateDto" OnValidSubmit="HandleSubmit">
+                <FluentValidationValidator />
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small text-muted">Product Name</label>
+                        <InputText @bind-Value="updateDto.Name" class="form-control shadow-sm" placeholder="Enter product name..." />
+                        <ValidationMessage For="@(() => updateDto.Name)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Category</label>
+                        <InputSelect @bind-Value="updateDto.CategoryId" class="form-select shadow-sm">
+                            <option value="0">-- Select Category --</option>
+                            @if (Categories != null)
+                            {
+                                @foreach (var cat in Categories)
+                                {
+                                    <option value="@cat.Id">@cat.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => updateDto.CategoryId)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small text-muted">Minimum Stock</label>
+                        <InputNumber @bind-Value="updateDto.MinimumStock" class="form-control shadow-sm" />
+                        <ValidationMessage For="@(() => updateDto.MinimumStock)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small text-muted">Description</label>
+                        <InputTextArea @bind-Value="updateDto.Description" class="form-control shadow-sm" rows="3" placeholder="Brief description of the product..." />
+                        <ValidationMessage For="@(() => updateDto.Description)" class="text-danger small" />
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-outline-secondary px-4 fw-bold" @onclick="OnCancel">Cancel</button>
+                    <button type="submit" class="btn btn-dark px-4 fw-bold shadow">Save Changes</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ProductDetailsDTO Product { get; set; }
+    [Parameter, EditorRequired] public IEnumerable<CategoryDTO> Categories { get; set; }
+    [Parameter, EditorRequired] public EventCallback<UpdateProductBasicInfoDTO> Save { get; set; }
+    [Parameter, EditorRequired] public EventCallback Cancel { get; set; }
+
+    private UpdateProductBasicInfoDTO updateDto = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Product != null)
+        {
+            updateDto.ProductId = Product.Id;  
+            updateDto.Name = Product.Name;
+            updateDto.Description = Product.Description;
+            updateDto.CategoryId = Product.CategoryId;
+            updateDto.MinimumStock = Product.MinimumStock;
+        }
+    }
+    private async Task HandleSubmit()
+    {
+        await Save.InvokeAsync(updateDto);
+        ResetDto();
+    }
+    private async Task OnCancel()
+    {
+        ResetDto();
+        await Cancel.InvokeAsync();
+    }
+
+    private void ResetDto()
+    {
+        updateDto = new UpdateProductBasicInfoDTO();
+        StateHasChanged();
+    }
+}

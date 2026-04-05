@@ -1,26 +1,103 @@
-﻿<div class="modal show d-block" style="background: rgba(0,0,0,0.5)">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Update Pricing Info</h5>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold">PURCHASE PRICE (COST)</label>
-                    <input type="number" class="form-control" placeholder="0.00" />
+﻿<div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
+     style="z-index: 1070;" @onclick="Cancel">
+    
+    <div class="card shadow-lg border-0 bg-white rounded-4 animate__animated animate__fadeInUp"
+         style="width: 100%; max-width: 450px;" @onclick:stopPropagation>
+        
+        <div class="card-header bg-success text-white p-3 border-0 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="mb-0 fw-bold"><i class="oi oi-dollar me-2"></i> Pricing & Profit Analysis</h5>
+            <button type="button" class="btn-close btn-close-white" @onclick="OnCancel"></button>
+        </div>
+
+        <div class="card-body p-4">
+            <EditForm Model="pricingDto" OnValidSubmit="HandleSubmit">
+                <FluentValidationValidator />
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small text-muted">Purchase Price (Cost)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">$</span>
+                            <InputNumber @bind-Value="pricingDto.PurchasePrice" class="form-control shadow-sm border-start-0" placeholder="0.00" />
+                        </div>
+                        <ValidationMessage For="@(() => pricingDto.PurchasePrice)" class="text-danger small" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold small text-muted">Selling Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">$</span>
+                            <InputNumber @bind-Value="pricingDto.SellingPrice" class="form-control shadow-sm border-start-0" placeholder="0.00" />
+                        </div>
+                        <ValidationMessage For="@(() => pricingDto.SellingPrice)" class="text-danger small" />
+                    </div>
+
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 bg-light border border-dashed text-center">
+                            <div class="row">
+                                <div class="col-6 border-end">
+                                    <span class="d-block small text-muted">Net Profit</span>
+                                    <h4 class="mb-0 @(GetProfit() >= 0 ? "text-success" : "text-danger")">
+                                        @GetProfit().ToString("C2")
+                                    </h4>
+                                </div>
+                                <div class="col-6">
+                                    <span class="d-block small text-muted">Margin (%)</span>
+                                    <h4 class="mb-0 @(GetMargin() >= 0 ? "text-success" : "text-danger")">
+                                        @GetMargin().ToString("F1")%
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label text-muted small fw-bold">SELLING PRICE</label>
-                    <input type="number" class="form-control" placeholder="0.00" />
+
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-light px-4 fw-bold" @onclick="Cancel">Cancel</button>
+                    <button type="submit" class="btn btn-success px-4 fw-bold shadow">Save Pricing</button>
                 </div>
-                <div class="alert alert-info py-2 small">
-                    Estimated Profit Margin: <strong>20%</strong>
-                </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button class="btn btn-light">Cancel</button>
-                <button class="btn btn-primary px-4">Save Pricing</button>
-            </div>
+            </EditForm>
         </div>
     </div>
 </div>
+
+@code {
+    [Parameter, EditorRequired] public ProductDetailsDTO Product { get; set; }
+    [Parameter] public EventCallback<UpdateProductPricingDTO> OnSave { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private UpdateProductPricingDTO pricingDto = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Product != null)
+        {
+            pricingDto.Id = Product.Id; 
+            pricingDto.PurchasePrice = Product.PurchasePrice;
+            pricingDto.SellingPrice = Product.SellingPrice;
+        }
+    }
+
+    private decimal GetProfit() => (pricingDto.SellingPrice ?? 0) - (pricingDto.PurchasePrice ?? 0);
+
+    private decimal GetMargin()
+    {
+        if (pricingDto.SellingPrice == null || pricingDto.SellingPrice == 0) return 0;
+        return (GetProfit() / pricingDto.SellingPrice.Value) * 100;
+    }
+
+    private async Task HandleSubmit()
+    {
+        await OnSave.InvokeAsync(pricingDto);
+    }
+    private async Task Cancel()
+    {
+        ResetDto();
+        await OnCancel.InvokeAsync();
+    }
+
+    private void ResetDto()
+    {
+        pricingDto = new UpdateProductPricingDTO();
+        StateHasChanged();
+    }
+}

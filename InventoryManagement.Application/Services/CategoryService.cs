@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using InventoryManagement.Application.DTO;
 using InventoryManagement.Application.Mapping;
 using InventoryManagement.Application.Persistence;
 using InventoryManagement.Application.ResultHelpers;

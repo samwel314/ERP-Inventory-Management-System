@@ -1,96 +1,241 @@
 ﻿@page "/products/add"
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold"><i class="oi oi-plus me-2 text-primary"></i> Create New Product</h3>
-        <div>
-            <button class="btn btn-outline-secondary me-2">Cancel</button>
-            <button class="btn btn-primary px-5 shadow">Save Product</button>
-        </div>
-    </div>
+<EditForm  EditContext="_editContext" OnValidSubmit="SubmitForm">
+    <FluentValidationValidator />
+    <div class="container py-4">
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-info me-2"></i> General Information</div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label small fw-bold">Product Name *</label>
-                            <input type="text" class="form-control" placeholder="e.g. iPhone 15 Pro Max" />
+        <div class="row">
+            <div class="col-12">
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger border-0 shadow-sm rounded-4 d-flex align-items-center mb-4 p-3 animate__animated animate__fadeIn">
+                        <i class="bi bi-exclamation-octagon-fill fs-4 me-3"></i>
+                        <div>
+                            <div class="fw-bold text-uppercase small">Submission Failed</div>
+                            <div class="small text-secondary-emphasis">@errorMessage</div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">Category *</label>
-                            <select class="form-select">
-                                <option selected disabled>Select Category</option>
-                                <option>Electronics</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold">Brand (Optional)</label>
-                            <input type="text" class="form-control" placeholder="e.g. Apple" />
-                        </div>
+                        <button type="button" class="btn-close ms-auto" @onclick="() => errorMessage = null" aria-label="Close"></button>
                     </div>
-                </div>
-            </div>
+                }
 
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-dollar me-2"></i> Pricing & Tax</div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label small fw-bold">Cost Price</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" placeholder="0.00" />
+                @if (showSuccess)
+                {
+                    <div class="alert alert-success border-0 shadow-sm rounded-4 d-flex align-items-center mb-4 p-3 animate__animated animate__fadeIn">
+                        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                        <div>
+                            <div class="fw-bold text-uppercase small">Success</div>
+                            <div class="small text-secondary-emphasis">Product has been successfully added to the catalog.</div>
+                        </div>
+                        <button type="button" class="btn-close ms-auto" @onclick="() => showSuccess = false" aria-label="Close"></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+
+        <div class="d-flex justify-content-between align-items-center mb-4 sticky-top bg-light py-2 shadow-sm px-3 rounded">
+            <div>
+                <h3 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-box-seam me-2 text-primary"></i> Create New Product
+                </h3>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 small">
+                        <li class="breadcrumb-item"><a href="#">Inventory</a></li>
+                        <li class="breadcrumb-item active">New Product</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" @onclick="Reset" class="btn btn-outline-secondary px-4 border-0">
+                    <i class="bi bi-x-circle me-1"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary px-5 shadow-sm fw-bold">
+                    <i class="bi bi-check2-circle me-1"></i> Save Product
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4 rounded-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-muted small uppercase tracking-wider">
+                            <i class="bi bi-info-circle me-2 text-primary"></i> GENERAL INFORMATION
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Product Name <span class="text-danger">*</span></label>
+                                <InputText @bind-Value="_product.Name" class="form-control form-control-lg bg-light border-0" placeholder="e.g. iPhone 15 Pro Max" />
+                                <ValidationMessage For="@(() => _product.Name)" class="text-danger small mt-1" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-secondary small">Category <span class="text-danger">*</span></label>
+                                <InputSelect @bind-Value="_product.CategoryId" class="form-select bg-light border-0">
+                                    <option value="0">-- Select Category --</option>
+                                    @if (Categories!= null)
+                                    {
+                                        @foreach (var category in Categories)
+                                        {
+                                            <option value="@category.Id">@category.Name</option>
+                                        }
+                                    }
+
+                                </InputSelect>
+                                <ValidationMessage For="@(() => _product.CategoryId)" class="text-danger small mt-1" />
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-secondary small">Description</label>
+                                <InputTextArea @bind-Value="_product.Description" class="form-control bg-light border-0" rows="3" placeholder="Write product details here..." />
+                                <ValidationMessage For="@(() => _product.Description)" class="text-danger small mt-1" />
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label small fw-bold">Selling Price *</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" placeholder="0.00" />
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold text-muted small uppercase">
+                            <i class="bi bi-currency-dollar me-2 text-success"></i> PRICING & PROFIT
+                        </h5>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-secondary small">Purchase Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 bg-white fw-bold text-muted">$</span>
+                                    <InputNumber @bind-Value="_product.PurchasePrice" class="form-control bg-light border-0" />
+                                </div>
+                                <ValidationMessage For="@(() => _product.PurchasePrice)" class="text-danger small mt-1" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-secondary small">Selling Price <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 bg-white fw-bold text-muted">$</span>
+                                    <InputNumber @bind-Value="_product.SellingPrice" class="form-control bg-light border-0 text-primary fw-bold" />
+                                </div>
+                                <ValidationMessage For="@(() => _product.SellingPrice)" class="text-danger small mt-1" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-secondary small">Expected Margin</label>
+                                <div class="form-control bg-light border-0 text-muted small">
+                                    @((_product.SellingPrice - _product.PurchasePrice).ToString("C"))
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label small fw-bold">Tax Percentage (%)</label>
-                            <input type="number" class="form-control" value="14" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark border-0 py-3">
+                        <h6 class="mb-0 fw-bold text-white small">
+                            <i class="bi bi-shield-check me-2"></i> INVENTORY CONTROL
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary small">SKU / Serial</label>
+                            <InputText @bind-Value="_product.SKU" class="form-control bg-light border-2 border-dashed fw-bold" placeholder="Ex:P-10-15" />
+                            <ValidationMessage For="@(() => _product.SKU)" class="text-danger small mt-1" />
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold text-secondary small">Min Stock Alert</label>
+                            <InputNumber @bind-Value="_product.MinimumStock" class="form-control bg-light" />
+                            <ValidationMessage For="@(() => _product.MinimumStock)" class="text-danger small mt-1" />
+                            <div class="form-text small mt-2">You'll receive a notification when stock hits this level.</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-barcode me-2"></i> Stock & SKU</div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">SKU Code</label>
-                        <input type="text" class="form-control bg-light" placeholder="Auto-generated or Manual" />
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-white border-0 py-3 text-center">
+                        <h6 class="mb-0 fw-bold text-muted small">PRODUCT MEDIA</h6>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Initial Quantity</label>
-                        <input type="number" class="form-control border-primary" placeholder="0" />
-                        <div class="form-text small text-primary">This will create the first stock movement.</div>
+                    <div class="upload-area border border-2 border-dashed rounded-4 p-4 text-center bg-light mb-3">
+                        <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
+                        <p class="small fw-bold text-dark mt-2 mb-1">Click to Upload Product Image</p>
+                        <InputFile OnChange="HandleFileSelected" class="form-control form-control-sm" />
+                        <ValidationMessage For="@(() => _product.Image)" class="text-danger small mt-1" />
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Minimum Alert Level</label>
-                        <input type="number" class="form-control border-warning" placeholder="5" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white fw-bold"><i class="oi oi-image me-2"></i> Product Image</div>
-                <div class="card-body text-center py-4">
-                    <div class="border border-2 border-dashed rounded p-4 mb-2">
-                        <i class="oi oi-cloud-upload fs-1 text-muted"></i>
-                        <p class="small text-muted mt-2">Click to upload or drag image</p>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary">Choose File</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</EditForm>
+
+@code
+{
+    [Inject]
+    public HttpClient productClient { get; set; } = null!;
+    private CreateProductUiDto _product = new();
+    private IEnumerable<CategoryDTO>? Categories;
+    private EditContext _editContext = default!;
+
+    private bool showSuccess = false ; 
+    private string ? errorMessage {get ;set ; } 
+    private async Task SubmitForm()
+    {
+        errorMessage = null;
+        showSuccess = false;
+
+        using var content = new MultipartFormDataContent();
+        content.Add(new StringContent(_product.Name ?? ""), "Name");
+        content.Add(new StringContent(_product.SKU ?? ""), "SKU");
+        content.Add(new StringContent(_product.Description ?? ""), "Description");
+        content.Add(new StringContent(_product.SellingPrice.ToString()), "SellingPrice");
+        content.Add(new StringContent(_product.PurchasePrice.ToString()), "PurchasePrice");
+        content.Add(new StringContent(_product.MinimumStock.ToString()), "MinimumStock");
+        content.Add(new StringContent(_product.CategoryId.ToString()), "CategoryId");
+
+        if (_product.Image != null)
+        {
+            var fileContent = new StreamContent(_product.Image.OpenReadStream(_product.Image.Size));
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(_product.Image.ContentType);
+            content.Add(fileContent, "Image", _product.Image.Name);
+        }
+        var response = await productClient.PostAsync
+        ($"{UrlsPath.BaseUrl}{UrlsPath.Products}", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>() ; 
+            errorMessage = errorResponse?.Message  ?? "We have a problem please try later"; 
+        }
+        else
+        {
+            showSuccess = true;
+            _product = new() ; 
+            _editContext = new EditContext(_product);
+            _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+        }
+
+    }
+
+    private void Reset ()
+    {
+        _product = new() ; 
+        showSuccess = false ; 
+        errorMessage = null ; 
+        _editContext = new EditContext(_product);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(_product);
+        _editContext.SetFieldCssClassProvider(new BootstrapCssClassProvider());
+        Categories = await productClient!.
+            GetFromJsonAsync<IEnumerable<CategoryDTO>>
+            ($"{UrlsPath.BaseUrl}{UrlsPath.Categories}/lookUp");
+    }
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+         _product.Image = e.File;
+        _editContext.NotifyFieldChanged(FieldIdentifier.Create(() => _product.Image));
+    }
+}

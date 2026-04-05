@@ -1,18 +1,17 @@
 ﻿using FluentValidation;
-using InventoryManagement.Application.DTO;
+using InventoryManagement.Shared.DTO;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace InventoryManagement.Application.Validations
+namespace InventoryManagement.Shared.Validations
 {
-    public class CreateProductValidator : AbstractValidator<CreateProductDTO>
+    public class CreateProductValidator : AbstractValidator<CreateProductBaseDTO>
     {
         public CreateProductValidator()
         {
-            // اي LOGIC هيكون هنا هنا 
             RuleFor(m => m.Name).ValidName(); 
             RuleFor(m => m.Description).ValidDescription();
             RuleFor(m => m.SKU).ValidSKU();
@@ -20,7 +19,6 @@ namespace InventoryManagement.Application.Validations
             RuleFor(m => m.SellingPrice).ValidSellingPrice();   
             RuleFor(m => m.PurchasePrice).ValidPurchasePrice();
             RuleFor(m => m.CategoryId).ValidCategoryId();   
-            RuleFor(m => m.Image).ValidImage(); 
         }
     }
 }

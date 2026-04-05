@@ -5,6 +5,7 @@ using InventoryManagement.Application.Services;
 using InventoryManagement.Application.Validations;
 using InventoryManagement.Infrastructure;
 using InventoryManagement.Infrastructure.Persistence.Data;
+using InventoryManagement.Shared.Validations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;

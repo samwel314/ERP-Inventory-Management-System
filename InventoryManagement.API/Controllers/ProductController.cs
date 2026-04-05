@@ -1,6 +1,7 @@
-﻿using InventoryManagement.Application.DTO;
+﻿using InventoryManagement.Application.DTOS;
 using InventoryManagement.Application.ResultHelpers;
 using InventoryManagement.Application.Services;
+using InventoryManagement.Shared.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 
@@ -20,7 +21,7 @@ namespace InventoryManagement.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create( CreateProductDTO dto, CancellationToken ct = default)
+        public async Task<IActionResult> Create(CreateProductApiDto dto, CancellationToken ct = default)
         {
             var result = await _productService.CreateProductAsync(dto, ct);
             if (!result.IsSuccess)
@@ -62,7 +63,7 @@ namespace InventoryManagement.API.Controllers
         }
 
 
-        [HttpPatch("{id}/info")]
+        [HttpPut("{id}/info")]
         public async Task<IActionResult> UpdateProductBasicInfo(Guid id , UpdateProductBasicInfoDTO dto   ,CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductBasicInfoAsync(id , dto ,ct );
@@ -78,7 +79,7 @@ namespace InventoryManagement.API.Controllers
             }
             return NoContent();     
         }
-        [HttpPatch("{id}/pricing")]
+        [HttpPut("{id}/pricing")]
         public async Task<IActionResult> UpdateProductPricingInfo(Guid id, UpdateProductPricingDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductPricingAsync(id, dto, ct);
@@ -86,7 +87,7 @@ namespace InventoryManagement.API.Controllers
                 return NotFound(new { message = result.ErrorMessage }); 
             return NoContent();
         }
-        [HttpPatch("{id}/sku")]
+        [HttpPut("{id}/sku")]
         public async Task<IActionResult> UpdateProductSKUInfo(Guid id, UpdateProductSKUDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductSKUAsync(id, dto, ct);
@@ -102,8 +103,8 @@ namespace InventoryManagement.API.Controllers
             }
             return NoContent();
         }
-        [HttpPatch("{id}/image")]
-        public async Task<IActionResult> UpdateProductImage(Guid id, UpdateProductImageDTO dto, CancellationToken ct = default)
+        [HttpPut("{id}/image")]
+        public async Task<IActionResult> UpdateProductImage(Guid id, UpdateProductImageApiDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductImageAsync(id, dto, ct);
             if (!result.IsSuccess)

@@ -1,13 +1,12 @@
-﻿using InventoryManagement.Application.Validations;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace InventoryManagement.Application.DTO
+namespace InventoryManagement.Shared.DTO
 {
-    public class CreateProductDTO
+    public class CreateProductBaseDTO
     {
         public string ? Name { get;  set; } = null!;
         public string? Description { get;  set; }
@@ -16,6 +15,5 @@ namespace InventoryManagement.Application.DTO
         public decimal SellingPrice { get;  set; }
         public decimal PurchasePrice { get;  set; }
         public int CategoryId { get;  set; }
-        public IFormFile ? Image { get;  set; } = null!;
     }
 }

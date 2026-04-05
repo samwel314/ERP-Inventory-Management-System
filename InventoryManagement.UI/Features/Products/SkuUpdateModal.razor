@@ -1,41 +1,69 @@
-﻿<div class="modal show d-block shadow-lg" style="background: rgba(0,0,0,0.4)">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title"><i class="oi oi-barcode me-2"></i> Inventory & SKU Details</h5>
-                <button type="button" class="btn-close btn-close-white"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <label class="form-label fw-bold small text-uppercase">SKU / Serial Number</label>
-                        <input type="text" class="form-control bg-light fw-mono" placeholder="e.g., WH-102-BLU-S" />
-                        <small class="text-muted">Unique identifier for this product variant.</small>
-                    </div>
+﻿<div class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center"
+     style="z-index: 1080;" @onclick="Cancel">
+    <div class="card shadow-lg border-0 bg-white rounded-4 animate__animated animate__fadeInDown"
+         style="width: 100%; max-width: 400px;" @onclick:stopPropagation>
+        
+        <div class="card-header bg-secondary text-white p-3 border-0 d-flex justify-content-between align-items-center rounded-top-4">
+            <h5 class="mb-0 fw-bold"><i class="oi oi-barcode me-2"></i> Inventory SKU</h5>
+            <button type="button" class="btn-close btn-close-white" @onclick="Cancel"></button>
+        </div>
 
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold small">MINIMUM LEVEL (Alert)</label>
-                        <input type="number" class="form-control border-warning" placeholder="5" />
-                        <div class="form-text text-warning small">System will alert at this level.</div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold small">MAXIMUM LEVEL</label>
-                        <input type="number" class="form-control" placeholder="100" />
-                    </div>
+        <div class="card-body p-4 text-center">
+            <EditForm Model="skuDto" OnValidSubmit="HandleSubmit">
+                <FluentValidationValidator />
 
-                    <div class="col-12">
-                        <label class="form-label fw-bold small">DEFAULT STORAGE LOCATION</label>
-                        <select class="form-select">
-                            <option>Main Warehouse (A1)</option>
-                            <option>Secondary Warehouse (B5)</option>
-                        </select>
+                <div class="mb-4">
+                    <div class="display-6 text-secondary mb-3">
+                        <i class="oi oi-tag"></i>
                     </div>
+                    <label class="form-label fw-semibold text-muted d-block">Stock Keeping Unit (SKU)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="oi oi-barcode"></i></span>
+                        <InputText @bind-Value="skuDto.SKU" class="form-control form-control-lg shadow-sm" placeholder="Scan or enter SKU..." />
+                    </div>
+                    <ValidationMessage For="@(() => skuDto.SKU)" class="text-danger small mt-2" />
+                    <p class="text-muted small mt-3">Current SKU: <span class="fw-bold text-dark">@(string.IsNullOrEmpty(Product.SKU) ? "None" : Product.SKU)</span></p>
                 </div>
-            </div>
-            <div class="modal-footer bg-light border-0">
-                <button class="btn btn-secondary px-4">Close</button>
-                <button class="btn btn-dark px-4">Update SKU Info</button>
-            </div>
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <button type="button" class="btn btn-light px-4 fw-bold" @onclick="Cancel">Cancel</button>
+                    <button type="submit" class="btn btn-secondary px-4 fw-bold shadow">Update SKU</button>
+                </div>
+            </EditForm>
         </div>
     </div>
 </div>
+
+@code {
+    [Parameter, EditorRequired] public ProductListDTO Product { get; set; }
+    [Parameter, EditorRequired] public EventCallback<UpdateProductSKUDTO> OnSave { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnCancel { get; set; }
+
+    private UpdateProductSKUDTO skuDto = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Product != null)
+        {
+            skuDto.SKU = Product.SKU;
+            skuDto.Id = Product.Id;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        await OnSave.InvokeAsync(skuDto);
+        ResetDto();
+    }
+
+    private async Task Cancel()
+    {
+        ResetDto();
+        await OnCancel.InvokeAsync();
+    }
+
+    private void ResetDto()
+    {
+        skuDto = new UpdateProductSKUDTO();
+        StateHasChanged();
+    }
+}

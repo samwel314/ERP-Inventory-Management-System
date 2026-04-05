@@ -52,12 +52,6 @@
                                             @onclick="() => OnEdit.InvokeAsync(cat)">
                                         <i class="bi bi-pencil-square text-primary"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-white border"
-                                            disabled="@(cat.ProductsCount > 0)"
-                                            @onclick="() => OnDelete.InvokeAsync(cat)"
-                                            title="@(cat.ProductsCount > 0 ? "Cannot delete: Category has products" : "Delete Category")">
-                                        <i class="bi bi-trash @(cat.ProductsCount > 0 ? "text-muted" : "text-danger")"></i>
-                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -81,5 +75,5 @@
     [Parameter,EditorRequired] public IEnumerable<CategoryListDTO> Categories { get; set; } 
     [Parameter,EditorRequired] public EventCallback<CategoryListDTO> OnEdit { get; set; }
     [Parameter,EditorRequired] public EventCallback<CategoryListDTO> OnDelete { get; set; }
-    [Parameter,EditorRequired] public EventCallback<CategoryListDTO> OnToggleStatus { get; set; }
+    [Parameter,EditorRequired] public EventCallback<CategoryListDTO> OnToggleStatus { get; set; }    
 }

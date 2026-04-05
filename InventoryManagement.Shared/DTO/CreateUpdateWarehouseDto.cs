@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace InventoryManagement.Application.DTO
+namespace InventoryManagement.Shared.DTO
 {
     public class CreateUpdateWarehouseDto
     {
