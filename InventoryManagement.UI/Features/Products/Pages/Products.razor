@@ -24,7 +24,7 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-            <ProductDataGrid products="products" ChangeStatus="ChangeStatus" OnViewDetails="LoadSelectedProduct" ChangeImage="ChangeImage" />
+            <ProductDataGrid products="products" ChangeBasicInfo="ChangeBasicInfoLoad" ChangeStatus="ChangeStatus" OnViewDetails="ViewProduct" ChangeImage="ChangeImage" />
         </div>
     </div>
 </div>
@@ -53,6 +53,10 @@
 {
     <ImageUpdateCell product="productToUpdate" Cancel="CancelUpdateImage" ChangeImage="HandleChangeImage" />
 }
+@if (updateProductBasicInfo)
+{ 
+    <UpdateProductBasicInfo Cancel="CancelUpdateBasicInfo" Save="HandleChangeBasicInfo" Categories="Categories" Product="selectedProduct" />
+}
 @code
 {
     [Parameter, SupplyParameterFromQuery] public string? SearchTerm { get; set; }
@@ -72,6 +76,7 @@
     private bool isPanelOpen = false;
     private bool isLoadingDetails = true;
     private bool updateImageModalOpen = false;
+    private bool updateProductBasicInfo = false;    
     protected override async Task OnInitializedAsync()
     {
         Categories = await ProductHttpClient!.
@@ -149,15 +154,10 @@
         isLoadingDetails = true;
     }
 
-    private async Task LoadSelectedProduct(ProductListDTO product)
+    private async Task ViewProduct(ProductListDTO product)
     {
         isPanelOpen = true;
-        if (selectedProduct == null || selectedProduct.Id != product.Id)
-        {
-            isLoadingDetails = true;
-            selectedProduct = await ProductHttpClient!.GetFromJsonAsync<ProductDetailsDTO>
-              ($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{product.Id}");
-        }
+        await LoadSelectedProduct(product.Id) ; 
         isLoadingDetails = false;
     }
     private async Task ChangeImage(ProductListDTO product)
@@ -165,10 +165,16 @@
         productToUpdate = product;
         updateImageModalOpen = true;
     }
+
     private async Task CancelUpdateImage()
     {
         productToUpdate = null!;
         updateImageModalOpen = false;
+    }
+    private async Task CancelUpdateBasicInfo()
+    {
+        //  selectedProduct = null!; // 
+        updateProductBasicInfo = false;
     }
     private async Task HandleChangeImage(UpdateProductImageUiDTO product)
     {
@@ -195,6 +201,41 @@
             Console.WriteLine("Error updating image");
             errorMessage = "Error updating status";
             updateImageModalOpen = false;
+        }
+    }
+
+    private async Task HandleChangeBasicInfo(UpdateProductBasicInfoDTO product)
+    {
+        var url = $"{UrlsPath.BaseUrl}{UrlsPath.Products}";
+        var response = await ProductHttpClient!.
+        PutAsJsonAsync($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{product.ProductId}/info", product);
+        if (response.IsSuccessStatusCode)
+        {
+            errorMessage = null;
+            Console.WriteLine($"Product {product.ProductId} basic info updated successfully");
+            updateProductBasicInfo = false;
+            await LoadData();
+        }
+        else
+        {
+            Console.WriteLine("Error updating Basic Info");
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            errorMessage = error?.Message ?? "Error ! Try Later .";
+            updateProductBasicInfo = false;
+        }
+    }
+    private async Task ChangeBasicInfoLoad(ProductListDTO product)
+    {
+        updateProductBasicInfo = true;
+        await LoadSelectedProduct(product.Id);
+    }
+    private async Task LoadSelectedProduct(Guid  productId)
+    {
+        if (selectedProduct == null || selectedProduct.Id != productId)
+        {
+            isLoadingDetails = true;
+            selectedProduct = await ProductHttpClient!.GetFromJsonAsync<ProductDetailsDTO>
+              ($"{UrlsPath.BaseUrl}{UrlsPath.Products}/{productId}");
         }
     }
 }
