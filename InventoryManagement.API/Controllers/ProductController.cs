@@ -79,7 +79,7 @@ namespace InventoryManagement.API.Controllers
             }
             return NoContent();     
         }
-        [HttpPatch("{id}/pricing")]
+        [HttpPut("{id}/pricing")]
         public async Task<IActionResult> UpdateProductPricingInfo(Guid id, UpdateProductPricingDTO dto, CancellationToken ct = default)
         {
             var result = await _productService.UpdateProductPricingAsync(id, dto, ct);
