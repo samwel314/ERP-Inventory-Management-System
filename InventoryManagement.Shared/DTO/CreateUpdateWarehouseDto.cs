@@ -4,6 +4,7 @@ namespace InventoryManagement.Shared.DTO
 {
     public class CreateUpdateWarehouseDto
     {
+        public int ? Id { get; set; }
         [MaxLength(100, ErrorMessage = "Name must be less than 100 characters")]
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; } = null!;

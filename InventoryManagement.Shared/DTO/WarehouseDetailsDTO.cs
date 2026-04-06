@@ -2,9 +2,12 @@
 {
     public class WarehouseDetailsDTO
     {
-        public int Id { get; private set; }
-        public string Name { get; private set; } = null!;
-        public string City { get; private set; } = null!;
-        public string? Address { get; private set; } = null!;
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string City { get; set; } = null!;
+        public string? Address { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsActive { get;  set; }
     }
 }

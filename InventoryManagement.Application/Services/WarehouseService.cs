@@ -24,7 +24,7 @@ namespace InventoryManagement.Application.Services
             var exist = await IsNameExist(model.Name.Trim(), model.City.Trim(), ct);
             if (exist)
                 return Result<WarehouseDTO>.Failure("Warehouse name already exists in this city", ErrorType.Conflict);
-            var warehouse = new Warehouse(model.Name.Trim().ToLower() , model.City.Trim().ToLower());
+            var warehouse = new Warehouse(model.Name.Trim().ToLower() , model.City.Trim().ToLower() , model.Address!);
             await _db.Warehouses.CreateAsync(warehouse, ct);
             await _db.SaveChangesAsync(ct);
             return Result<WarehouseDTO>.Success(_mapper.Map<WarehouseDTO>(warehouse));

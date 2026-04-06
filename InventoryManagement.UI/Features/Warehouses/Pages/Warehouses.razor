@@ -1,0 +1,179 @@
+﻿@page "/warehouses"
+
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-md-4">
+        <h3 class="fw-bold mb-0 text-navy">Warehouses Management</h3>
+        <p class="text-muted small">Manage your storage locations and distribution centers</p>
+    </div>
+    
+    <div class="col-md-5">
+        <div class="input-group shadow-sm">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input @bind="searchTerm" type="text" class="form-control border-start-0" placeholder="Search by name or city..." />
+            <button @onclick="ApplyFilter" class="btn btn-outline-primary px-3">
+                <i class="oi oi-funnel me-1"></i> Apply
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-3 text-md-end">
+        <button class="btn btn-dark shadow-sm px-4" @onclick="OpenAddModal">
+            <i class="bi bi-plus-lg me-2"></i>New Warehouse
+        </button>
+    </div>
+</div>
+
+@if (warehouses == null)
+{
+    <div class="d-flex justify-content-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else
+{
+    <WarehouseGrid Warehouses="warehouses" OnEdit="Edit" OnToggleStatus="ChangeStatus" />
+}
+
+@if (isAddMode)
+{
+    <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5); z-index: 1050;" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <EditForm Model="warehouseModel" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="fw-bold">
+                            <i class="bi bi-building me-2 text-primary"></i>
+                            @(isEditMode ? "Update Warehouse" : "Add New Warehouse")
+                        </h5>
+                        <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                    </div>
+
+                    <div class="modal-body py-4">
+                        @if (!string.IsNullOrEmpty(modalErrorMessage))
+                        {
+                            <div class="alert alert-danger border-0 small rounded-3 mb-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i> @modalErrorMessage
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Warehouse Name</label>
+                            <InputText @bind-Value="warehouseModel.Name" class="form-control bg-light border-0 shadow-none" placeholder="e.g. Main Hub" />
+                            <ValidationMessage For="@(() => warehouseModel.Name)" class="text-danger small mt-1" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">City</label>
+                            <InputText @bind-Value="warehouseModel.City" class="form-control bg-light border-0 shadow-none" placeholder="e.g. Cairo" />
+                            <ValidationMessage For="@(() => warehouseModel.City)" class="text-danger small mt-1" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Address Details</label>
+                            <InputTextArea @bind-Value="warehouseModel.Address" class="form-control bg-light border-0 shadow-none" rows="2" placeholder="Full address..." />
+                            <ValidationMessage For="@(() => warehouseModel.Address)" class="text-danger small mt-1" />
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-light px-4 rounded-3 fw-bold" @onclick="CloseModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary px-5 rounded-3 fw-bold shadow">Save</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string searchTerm = "";
+    private IEnumerable<WarehouseDetailsDTO>? warehouses;
+    private bool isAddMode = false;
+    private bool isEditMode = false;
+    private CreateUpdateWarehouseDto warehouseModel = new();
+    private string? modalErrorMessage;
+
+    [Inject] public HttpClient? Http { get; set; }
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+
+    private async Task ApplyFilter() => await LoadData();
+
+    private async Task LoadData()
+    {
+        var query = !string.IsNullOrEmpty(searchTerm) ? $"?searchTerm={searchTerm}" : "";
+        warehouses = await Http!.GetFromJsonAsync<IEnumerable<WarehouseDetailsDTO>>($"{UrlsPath.BaseUrl}{UrlsPath.Warehouses}{query}");
+    }
+
+    private void OpenAddModal()
+    {
+        warehouseModel = new();
+        isEditMode = false;
+        isAddMode = true;
+    }
+
+    private async Task Edit(WarehouseDetailsDTO warehouse)
+    {
+        warehouseModel = new CreateUpdateWarehouseDto
+        {
+            Id = warehouse.Id,
+            Name = warehouse.Name,
+            City = warehouse.City,
+            Address = warehouse.Address
+        };
+        isEditMode = true;
+        isAddMode = true;
+    }
+
+    private async Task HandleSubmit()
+    {
+        HttpResponseMessage response;
+        modalErrorMessage = null;
+
+        if (isEditMode)
+            response = await Http!.PutAsJsonAsync($"{UrlsPath.BaseUrl}{UrlsPath.Warehouses}/{warehouseModel.Id}", warehouseModel);
+        else
+            response = await Http!.PostAsJsonAsync($"{UrlsPath.BaseUrl}{UrlsPath.Warehouses}", warehouseModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadData();
+            CloseModal();
+        }
+        else
+        {
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            modalErrorMessage = error?.Message ?? "Server error occurred.";
+        }
+    }
+
+    private void CloseModal()
+    {
+        isAddMode = false;
+        isEditMode = false;
+        modalErrorMessage = null;
+    }
+    private async Task ChangeStatus(WarehouseDetailsDTO  warehouse)
+    {
+        var url = $"{UrlsPath.BaseUrl}{UrlsPath.Warehouses}";
+        if (warehouse.IsActive)
+            url = url + $"/{warehouse.Id}/deactivate";
+        else
+            url = url + $"/{warehouse.Id}/activate";
+
+        var response = await Http!.PutAsync(url, null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // عشان ال browser يعدل ف ram
+            warehouse.IsActive = !warehouse.IsActive;
+            Console.WriteLine($"category {warehouse.Name} is now {(warehouse.IsActive ? "Active" : "Deactivated")}");
+        }
+        else
+        {
+            Console.WriteLine("Error updating status");
+        }
+    }
+
+}
