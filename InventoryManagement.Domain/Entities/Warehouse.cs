@@ -14,12 +14,13 @@ namespace InventoryManagement.Domain.Entities
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; private set; }
         private Warehouse() { }    
-        public Warehouse(string name , string city)
+        public Warehouse(string name , string city , string address = null!)
         {
             ValidateName(name);
             ValidateCity(city); 
             Name = name;
             City = city;        
+            Address = address;  
         }
         private void ValidateName(string name)
         {
