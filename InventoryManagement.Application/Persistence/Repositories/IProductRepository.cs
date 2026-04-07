@@ -8,6 +8,8 @@ namespace InventoryManagement.Application.Persistence.Repositories
         void Delete(Product Product);
         Task<Product?> GetByIdAsync(Guid id, CancellationToken ct = default, bool track = false);
         IQueryable<Product> GetAll();
+        Task<bool> SameNameInCategoryExist(int categoryId, string productName, CancellationToken ct);
+        Task<bool> SKUExist(string Skd, CancellationToken ct);
     }
 
 }

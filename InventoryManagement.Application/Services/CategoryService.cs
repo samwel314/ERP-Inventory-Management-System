@@ -16,27 +16,20 @@ namespace InventoryManagement.Application.Services
     {
         private readonly IUnitOfWork _db;
         private readonly IMapper _mapper;
-
         public CategoryService(IUnitOfWork db, IMapper mapper)
         {
             _db = db;
             _mapper = mapper;
         }
-
         public async Task<Result<CategoryDTO>> CreateCategoryAsync(CreateUpdateCategoryDto model, CancellationToken ct = default)
         {
-            var exist = await IsNameExist(model.Name , ct);
+            var exist = await _db.Categories.IsNameExist(model.Name.Trim() , ct);
             if (exist)
                 return Result<CategoryDTO>.Failure("Category name already exists." , ErrorType.Conflict);
             var category = new Category(model.Name.ToLower().Trim());
             await _db.Categories.CreateAsync(category , ct );
             await _db.SaveChangesAsync(ct);
             return Result<CategoryDTO>.Success(_mapper.Map<CategoryDTO>(category));
-        }
-
-        private async Task<bool> IsNameExist(string name, CancellationToken ct = default)
-        {
-            return await _db.Categories.GetAll().AnyAsync(c => c.Name.ToLower() == name.ToLower() , ct);
         }
         public async Task<Result<CategoryDTO>> GetByIdAsync(int id , CancellationToken ct)
         {
@@ -59,16 +52,20 @@ namespace InventoryManagement.Application.Services
                 CategoriesQuery = CategoriesQuery.Where(c => c.IsActive == active);
             if (searchTerm != null)
                 CategoriesQuery = CategoriesQuery.Where(c => c.Name.Contains(searchTerm));
-          var Categories = await CategoriesQuery
-             .Select(c => new CategoryListDTO
-            {
-                Id = c.Id,  
-                Name = c.Name,  
-                UpdatedAt = c.UpdatedAt,
-                CreatedAt = c.CreatedAt,    
-                IsActive = c.IsActive,  
-                ProductsCount = c.Products.Count(),     
-            }).ToListAsync(ct);
+           var CategoriesDtoQuery =  CategoriesQuery
+               .Select(c => new CategoryListDTO
+               {
+                   Id = c.Id,
+                   Name = c.Name,
+                   UpdatedAt = c.UpdatedAt,
+                   CreatedAt = c.CreatedAt,
+                   IsActive = c.IsActive,
+                   ProductsCount = c.Products.Count(),
+               });
+            Console.WriteLine("----------*-*Show-*----------------");
+            Console.WriteLine(CategoriesDtoQuery.ToQueryString());
+            Console.WriteLine("----------*-*-*----------------");
+            var Categories = await CategoriesDtoQuery.ToListAsync(ct);
             return Result<IEnumerable<CategoryListDTO>>.Success(Categories);
         }
         public async Task <Result <string>> UpdateCategoryAsync (int id ,  CreateUpdateCategoryDto model , CancellationToken ct = default)
@@ -78,7 +75,7 @@ namespace InventoryManagement.Application.Services
                 return Result<string>.Failure("This Category not Found" , ErrorType.NotFound);
             if (!category.Name.Equals(model.Name , StringComparison.OrdinalIgnoreCase))  
             {
-                var exist = await IsNameExist(model.Name , ct );
+                var exist =  await _db.Categories.IsNameExist(model.Name.Trim() , ct );
                 if (exist)
                     return Result<string>.Failure("Category name already exists." , ErrorType.Conflict);
                 category.UpdateName(model.Name); 
