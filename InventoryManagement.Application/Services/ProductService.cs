@@ -14,7 +14,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
-using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 
 namespace InventoryManagement.Application.Services
@@ -35,15 +34,15 @@ namespace InventoryManagement.Application.Services
         public async Task<Result<ProductDetailsDTO>> CreateProductAsync(CreateProductApiDto dto, CancellationToken ct)
         {
             // check category 404 
-            var categoryExist = await CategoryExist(dto.CategoryId, ct);
+            var categoryExist = await _db.Categories.ExistsByIdAsync(dto.CategoryId, ct);
             if (!categoryExist)
                 return Result<ProductDetailsDTO>.Failure("This category Not Found ", ErrorType.NotFound);
             // 400
-            var sameNameExist = await SameNameInCategoryExist(dto.CategoryId, dto.Name!, ct);
+            var sameNameExist = await _db.Products.SameNameInCategoryExist(dto.CategoryId, dto.Name!, ct);
             if (sameNameExist)
                 return Result<ProductDetailsDTO>.Failure("You already have product with this name in the category ", ErrorType.Conflict);
             // 400
-            var sameSDKExist = await SKUExist(dto.SKU!, ct);
+            var sameSDKExist = await _db.Products.SKUExist(dto.SKU!, ct);
             if (sameSDKExist)
                 return Result<ProductDetailsDTO>.Failure("You already have product with this SKU  ", ErrorType.Conflict);
 
@@ -63,25 +62,8 @@ namespace InventoryManagement.Application.Services
             var productDTO = _mapper.Map<ProductDetailsDTO>(Product);
             return Result<ProductDetailsDTO>.Success(productDTO);
         }
-        private async Task<bool> CategoryExist(int id, CancellationToken ct)
-        {
-            return await _db.Categories.GetAll().AnyAsync(c => c.Id == id, ct);
-        }
-        private async Task<bool> SameNameInCategoryExist(int categoryId, string productName, CancellationToken ct)
-        {
-            // sql server by default not case Sensitive
-            // productName = productName.Trim().ToLower();    
-            return await _db.Products.GetAll().
-                AnyAsync
-                (p => p.CategoryId == categoryId &&
-                p.Name == productName, ct);
-        }
-        private async Task<bool> SKUExist(string Skd, CancellationToken ct)
-        {
-            return await _db.Products.GetAll().
-                AnyAsync
-                (p => p.SKU == Skd.Trim(), ct);
-        }
+ 
+   
         private async Task<string> SaveImageAsync(IFormFile image)
         {
             var webPath = _webenvironment.WebRootPath;
@@ -160,14 +142,14 @@ namespace InventoryManagement.Application.Services
 
             if (isCategoryChanged || isNameChanged)
             {
-                var sameNameExist = await SameNameInCategoryExist(finalCategoryId, finalName, ct);
+                var sameNameExist = await _db.Products.SameNameInCategoryExist(finalCategoryId, finalName, ct);
                 if (sameNameExist)
                     return Result<string>.Failure("A product with this name already exists in the selected category.", ErrorType.Conflict);
             }
 
             if (isCategoryChanged)
             {
-                var categoryExist = await CategoryExist(dto.CategoryId!.Value, ct);
+                var categoryExist = await _db.Categories.ExistsByIdAsync(dto.CategoryId!.Value, ct);
                 if (!categoryExist)
                     return Result<string>.Failure("Selected Category Not Found", ErrorType.NotFound);
 
@@ -213,7 +195,7 @@ namespace InventoryManagement.Application.Services
                 return Result<string>.Failure("This Product Not Found", ErrorType.NotFound);
             if (!product.SKU.Equals(dto.SKU!.ToLower().Trim() , StringComparison.OrdinalIgnoreCase))
             {
-                var sameSDKExist = await SKUExist(dto.SKU!, ct);
+                var sameSDKExist = await _db.Products.SKUExist(dto.SKU!, ct);
                 if (sameSDKExist)
                     return Result<string>.Failure("You already have product with this SKU  ", ErrorType.Conflict);
                 product.UpdateSKU(dto.SKU!.ToLower().Trim());

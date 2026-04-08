@@ -21,18 +21,13 @@ namespace InventoryManagement.Application.Services
 
         public async Task<Result<WarehouseDTO>> CreateWarehouseAsync(CreateUpdateWarehouseDto model, CancellationToken ct = default)
         {
-            var exist = await IsNameExist(model.Name.Trim(), model.City.Trim(), ct);
+            var exist = await _db.Warehouses.IsNameExist(model.Name.Trim(), model.City.Trim(),0 , ct);
             if (exist)
                 return Result<WarehouseDTO>.Failure("Warehouse name already exists in this city", ErrorType.Conflict);
             var warehouse = new Warehouse(model.Name.Trim().ToLower() , model.City.Trim().ToLower() , model.Address!);
             await _db.Warehouses.CreateAsync(warehouse, ct);
             await _db.SaveChangesAsync(ct);
             return Result<WarehouseDTO>.Success(_mapper.Map<WarehouseDTO>(warehouse));
-        }
-
-        private async Task<bool> IsNameExist(string name, string city , CancellationToken ct = default)
-        {
-            return await _db.Warehouses.GetAll().AnyAsync(w => w.Name == name && w.City == city , ct);
         }
         public async Task<Result<WarehouseDetailsDTO>> GetByIdAsync(int id, CancellationToken ct)
         {
@@ -70,7 +65,7 @@ namespace InventoryManagement.Application.Services
 
             if (isNameChanged || isCityChanged)
             {
-                var exist = await IsNameExist(model.Name, model.City, ct); 
+                var exist = await _db.Warehouses.IsNameExist(model.Name.Trim(), model.City.Trim() , id, ct); 
 
                 if (exist)
                     return Result<string>.Failure("Warehouse name already exists in this city.", ErrorType.Conflict);

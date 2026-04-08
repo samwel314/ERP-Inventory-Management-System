@@ -28,5 +28,9 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
             return track ? await _db.Warehouses.FirstOrDefaultAsync(w => w.Id == id, ct) :
                 await _db.Warehouses.AsNoTracking().FirstOrDefaultAsync(w => w.Id == id, ct);
         }
+        public async Task<bool> IsNameExist(string name, string city, int id = 0, CancellationToken ct = default)
+        {
+            return await _db.Warehouses.AnyAsync(w => w.Name == name && w.City == city && w.Id != id, ct);
+        }
     }
 }

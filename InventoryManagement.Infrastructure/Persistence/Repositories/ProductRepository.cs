@@ -34,5 +34,19 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
             else
                 return await _db.Products.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(p=> p.Id == id , ct); 
         }
+        public async Task<bool> SameNameInCategoryExist(int categoryId, string productName, CancellationToken ct)
+        {
+   
+            return await _db.Products.
+                AnyAsync
+                (p => p.CategoryId == categoryId &&
+                p.Name == productName, ct);
+        }
+        public async Task<bool> SKUExist(string Skd, CancellationToken ct)
+        {
+            return await _db.Products.
+                AnyAsync
+                (p => p.SKU == Skd.Trim(), ct);
+        }
     }
 }

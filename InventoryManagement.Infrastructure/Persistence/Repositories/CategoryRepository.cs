@@ -23,6 +23,12 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
         {
             _db.Categories.Remove(category);    
         }
+
+        public Task<bool> ExistsByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return _db.Categories.AllAsync(c => c.Id == id , cancellationToken);
+        }
+
         public IQueryable<Category> GetAll()
         {
             return _db.Categories.AsNoTracking();   
@@ -35,6 +41,11 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
             else
                 categoryFromDb = await _db.Categories.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(c=> c.Id == id , ct); 
             return categoryFromDb ; 
+        }
+
+        public async Task<bool> IsNameExist(string name, CancellationToken ct = default)
+        {
+            return await _db.Categories.AnyAsync(c => c.Name== name, ct);
         }
     }
 }
