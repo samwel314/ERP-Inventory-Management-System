@@ -58,7 +58,7 @@ namespace InventoryManagement.UnitTests.Application
                .ReturnsAsync(true);
             _mockUow.Setup(u => u.Categories).Returns(_mockRepo.Object);
 
-            var result = await _categoryService.CreateCategoryAsync(model, new CancellationToken());
+            var result = await _categoryService.CreateCategoryAsync(model, It.IsAny<CancellationToken>());
 
             Assert.NotNull(result);
             Assert.False(result.IsSuccess);
@@ -79,7 +79,7 @@ namespace InventoryManagement.UnitTests.Application
                .ReturnsAsync((Category)null!);
             _mockUow.Setup(u => u.Categories).Returns(_mockRepo.Object);
 
-            var result = await _categoryService.UpdateCategoryAsync(model.CategoryId.Value , model, new CancellationToken());
+            var result = await _categoryService.UpdateCategoryAsync(model.CategoryId.Value , model, It.IsAny<CancellationToken>());
 
             Assert.NotNull(result);
             Assert.False(result.IsSuccess);
@@ -101,7 +101,7 @@ namespace InventoryManagement.UnitTests.Application
                .ReturnsAsync(new Category (model.Name));
             _mockUow.Setup(u => u.Categories).Returns(_mockRepo.Object);
 
-            var result = await _categoryService.UpdateCategoryAsync(model.CategoryId.Value, model, new CancellationToken());
+            var result = await _categoryService.UpdateCategoryAsync(model.CategoryId.Value, model, It.IsAny<CancellationToken>());
 
             Assert.NotNull(result);
             Assert.True(result.IsSuccess);

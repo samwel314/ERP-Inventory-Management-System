@@ -8,6 +8,7 @@ namespace InventoryManagement.Application.Persistence.Repositories
         void Delete(Warehouse warehouse);
         Task<Warehouse?> GetByIdAsync(int id, CancellationToken ct = default, bool track = false);
         IQueryable<Warehouse> GetAll();
+        Task<bool> IsNameExist(string name, string city, int id = 0, CancellationToken ct = default);
     }
 
 }
