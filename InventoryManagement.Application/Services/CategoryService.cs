@@ -73,7 +73,7 @@ namespace InventoryManagement.Application.Services
             var category = await _db.Categories.GetByIdAsync(id, ct , true);
             if (category == null)
                 return Result<string>.Failure("This Category not Found" , ErrorType.NotFound);
-            if (!category.Name.Equals(model.Name , StringComparison.OrdinalIgnoreCase))  
+            if (!category.Name.Equals(model.Name.Trim()))  //**---
             {
                 var exist =  await _db.Categories.IsNameExist(model.Name.Trim() , ct );
                 if (exist)
