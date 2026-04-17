@@ -26,7 +26,7 @@ namespace InventoryManagement.Infrastructure.Persistence.Repositories
 
         public Task<bool> ExistsByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return _db.Categories.AllAsync(c => c.Id == id , cancellationToken);
+            return _db.Categories.AnyAsync(c => c.Id == id , cancellationToken);
         }
 
         public IQueryable<Category> GetAll()
