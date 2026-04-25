@@ -15,6 +15,8 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
+        public DbSet<ProductStock> ProductStocks { get; set; }  
+        public DbSet<StockMovement> StockMovements { get; set; }    
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
