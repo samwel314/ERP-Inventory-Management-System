@@ -10,6 +10,8 @@ namespace InventoryManagement.Application.Persistence
         ICategoryRepository Categories { get; }
         IProductRepository Products { get; }
         IWarehouseRepository Warehouses  { get; }
+        IProductStockRepository ProductStocks { get; }
+        IStockMovementRepository StockMovements { get; }    
         Task SaveChangesAsync(CancellationToken ct );    
     }
 }

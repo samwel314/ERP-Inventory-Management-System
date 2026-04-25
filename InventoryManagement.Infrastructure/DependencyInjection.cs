@@ -16,7 +16,9 @@ namespace InventoryManagement.Infrastructure
         {
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IWarehouseRepository, WarehouseRepository>(); 
+            services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+            services.AddScoped<IStockMovementRepository, StockMovementRepository>();
+            services.AddScoped<IProductStockRepository, ProductStockRepository>();
             // Unit of Work 
             services.AddScoped<IUnitOfWork, UnitOfWork>();  
             return services; 
