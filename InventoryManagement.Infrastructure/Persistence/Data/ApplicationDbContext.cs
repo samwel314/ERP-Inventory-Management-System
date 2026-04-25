@@ -51,7 +51,10 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
             modelBuilder.Entity<ProductStock>().Property(ps => ps.Quantity).IsRequired();
             modelBuilder.Entity<ProductStock>().HasOne(ps => ps.Product).WithMany().HasForeignKey(ps => ps.ProductId);
             modelBuilder.Entity<ProductStock>().HasOne(ps => ps.Warehouse).WithMany().HasForeignKey(ps => ps.WarehouseId);
-
+            // *-*- *-*-* Stock Movement
+            modelBuilder.Entity<StockMovement>().HasOne(sm => sm.Product).WithMany().HasForeignKey(sm => sm.ProductId);
+            modelBuilder.Entity<StockMovement>().HasOne(sm => sm.FromWarehouse).WithMany().HasForeignKey(sm => sm.FromWarehouseId);
+            modelBuilder.Entity<StockMovement>().HasOne(sm => sm.ToWarehouse).WithMany().HasForeignKey(sm => sm.ToWarehouseId);
         }
     }
 }
