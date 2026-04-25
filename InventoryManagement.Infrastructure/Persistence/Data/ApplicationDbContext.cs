@@ -14,13 +14,13 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
         }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Warehouse> Warehouses { get; set; }        
+        public DbSet<Warehouse> Warehouses { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             // -*-*-*-* Category
             modelBuilder.Entity<Category>().Property(c => c.Name).IsRequired().HasMaxLength(100);
-            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne(p=>p.Category).HasForeignKey(p => p.CategoryId);
+            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne(p => p.Category).HasForeignKey(p => p.CategoryId);
             //- *-*-*-* Product 
             modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<Product>().Property(p => p.Description).HasMaxLength(1000);
@@ -35,13 +35,21 @@ namespace InventoryManagement.Infrastructure.Persistence.Data
                 t.HasCheckConstraint("CK_Product_PurchasePrice_GreaterThanZero", "[PurchasePrice] > 0 ");
             });
             modelBuilder.Entity<Product>().Property(p => p.SellingPrice).IsRequired().HasPrecision(18, 2);
-            modelBuilder.Entity<Product>().Property(p => p.PurchasePrice).IsRequired().HasPrecision(18 , 2);
+            modelBuilder.Entity<Product>().Property(p => p.PurchasePrice).IsRequired().HasPrecision(18, 2);
             modelBuilder.Entity<Product>().Property(p => p.ImageUrl).IsRequired();
 
             /// *-*-*-*-* Warehouse 
             modelBuilder.Entity<Warehouse>().Property(c => c.Name).IsRequired().HasMaxLength(100);
             modelBuilder.Entity<Warehouse>().Property(c => c.City).IsRequired().HasMaxLength(50);
             modelBuilder.Entity<Warehouse>().Property(c => c.Address).HasMaxLength(150);
+
+            // *-*-*-*-* Product Stock 
+          
+            modelBuilder.Entity<ProductStock>().HasKey(ps => new { ps.ProductId, ps.WarehouseId });
+            modelBuilder.Entity<ProductStock>().Property(ps => ps.Quantity).IsRequired();
+            modelBuilder.Entity<ProductStock>().HasOne(ps => ps.Product).WithMany().HasForeignKey(ps => ps.ProductId);
+            modelBuilder.Entity<ProductStock>().HasOne(ps => ps.Warehouse).WithMany().HasForeignKey(ps => ps.WarehouseId);
+
         }
     }
 }

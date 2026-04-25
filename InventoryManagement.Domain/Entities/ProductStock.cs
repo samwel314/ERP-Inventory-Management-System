@@ -22,7 +22,7 @@ namespace InventoryManagement.Domain.Entities
                 throw new ArgumentException("Quantity must be greater than 0");
         }
 
-        private bool CanWithdraw(int quantity) 
+        public bool CanWithdraw(int quantity) 
         {
             ValidateQuantity(quantity);
             return Quantity >= quantity;
@@ -51,7 +51,7 @@ namespace InventoryManagement.Domain.Entities
         public int WarehouseId { get; private set; }    
         public Guid ProductId { get; private set; } 
         public int Quantity { get; private set; }
-        public DateTime LastUpdated { get; set; } = DateTime.UtcNow; // عشان اعرف تاريخ اخر مخزون 
+        public DateTime LastUpdated { get; private set; } = DateTime.UtcNow; // عشان اعرف تاريخ اخر مخزون 
         // nav 
         [ForeignKey("ProductId")]
         public Product Product { get; private set; } = null!;
