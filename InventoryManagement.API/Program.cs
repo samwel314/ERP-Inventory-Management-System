@@ -29,6 +29,7 @@ builder.Services.AddAutoMapper(cfg =>
 builder.Services.AddScoped<CategoryService, CategoryService>();
 builder.Services.AddScoped<ProductService, ProductService>();
 builder.Services.AddScoped<WarehouseService, WarehouseService>();
+builder.Services.AddScoped<ProductStockService, ProductStockService>(); 
 builder.Services.AddOpenApi();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>();

@@ -27,6 +27,11 @@ namespace InventoryManagement.Application.Mapping
                 ForMember(dest => dest.NameWithCity, p => p.MapFrom(src => $"{src.Name}-({src.City})"));
             CreateMap<Warehouse, WarehouseDetailsDTO>();
 
+            CreateMap<ProductStock, ProductStockDto>().
+             ForMember(dest => dest.CategoryName, p => p.MapFrom(src => src.Product.Category.Name)).
+             ForMember(dest => dest.ProductName, p => p.MapFrom(src => src.Product.Name)).
+             ForMember(dest => dest.Sku, p => p.MapFrom(src => src.Product.SKU)).
+             ForMember(dest => dest.WarehouseName, p => p.MapFrom(src => src.Warehouse.Name));
         }
     }
 }
