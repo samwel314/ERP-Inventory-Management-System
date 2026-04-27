@@ -1,0 +1,256 @@
+﻿@page "/inventory"
+@using InventoryManagement.Domain.Entities
+@if (IsVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.1);">
+        <div class="modal-dialog ms-auto me-4 mt-4" style="max-width: 950px;">
+            <div class="modal-content shadow-lg border-0 border-top border-primary border-4">
+                
+                <EditForm Model="MovementModel" OnValidSubmit="HandleValidSubmit">
+
+                    <DataAnnotationsValidator />
+
+                    <div class="modal-body p-3">
+                        <div class="row g-2 align-items-end">
+                            
+                            <div class="col-md-12 mb-2 d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-primary small">
+                                    <i class="bi bi-lightning-charge-fill me-1"></i> Quick Stock Action
+                                </span>
+                                <button type="button" class="btn-close" style="font-size: 0.6rem;" @onclick="Close"></button>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold mb-1">Product</label>
+                                <InputSelect @bind-Value="MovementModel.ProductId" class="form-select form-select-sm bg-light border-0 shadow-sm">
+                                    <option value="">Choose Product...</option>
+                                    @if (productStocks != null)
+                                    {
+                                        @foreach (var w in productStocks.DistinctBy(ps=> ps.ProductId) )
+                                        {
+                                            <option value="@w.ProductId">@w.ProductName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold mb-1">Action</label>
+                                <InputSelect @bind-Value="MovementModel.Type" class="form-select form-select-sm bg-light border-0 shadow-sm fw-bold text-primary">
+                                    @foreach (var type in Enum.GetValues<MovementType>())
+                                    {
+                                        <option value="@type">@type.ToString()</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold mb-1 text-danger">From</label>
+                                <InputSelect @bind-Value="MovementModel.FromWarehouseId" class="form-select form-select-sm border-start border-danger border-3 shadow-sm">
+                                    <option value="">Source...</option>
+                                    @if (productStocks != null)
+                                    {
+                                        @foreach (var w in productStocks.DistinctBy(ps => ps.WarehouseId))
+                                        {
+                                            <option value="@w.WarehouseId">@w.WarehouseName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            @if (MovementModel.Type == MovementType.Transfer)
+                            {
+                                <div class="col-md-2 animate__animated animate__fadeIn">
+                                    <label class="form-label small fw-bold mb-1 text-success">To</label>
+                                    <InputSelect @bind-Value="MovementModel.ToWarehouseId" class="form-select form-select-sm border-start border-success border-3 shadow-sm">
+                                        <option value="">Target...</option>
+                                        @if (productStocks != null)
+                                        {
+                                            @foreach (var w in productStocks.DistinctBy(ps => ps.WarehouseId))
+                                            {
+                                                <option value="@w.WarehouseId">@w.WarehouseName</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="@(() => MovementModel.ToWarehouseId)" class="text-danger x-small" />
+                                </div>
+                            }
+
+                            <div class="col-md-1 text-center">
+                                <label class="form-label small fw-bold mb-1">Qty</label>
+                                <InputNumber @bind-Value="MovementModel.Quantity" class="form-control form-control-sm border-0 bg-light shadow-sm text-center" />
+                            </div>
+
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm">
+                                    <i class="bi bi-check2"></i> Save
+                                </button>
+                            </div>
+
+                        </div>
+                        
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <ValidationSummary class="text-danger small mb-0" style="font-size: 0.7rem;" />
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold">Stock Inventory</h3>
+        <p class="text-muted">View and manage product levels across all warehouses.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-download"></i> Export Report
+        </button>
+        <button @onclick="Show" class="btn btn-primary">
+            <i  class="bi bi-plus-circle"></i> New Adjustment
+        </button>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Search Product</label>
+                <input @bind="searchTerm" type="text" class="form-control" placeholder="Search by Name or SKU...">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Warehouse</label>
+                <select @bind="selectedWarehouseId" class="form-select">
+                    <option value="">All Warehouses</option>
+                    @if (warehouses != null)
+                    {
+                        @foreach (var warehouse in warehouses)
+                        {
+                            <option value="@warehouse.Id">@warehouse.NameWithCity</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button @onclick="ApplyFilter" class="btn btn-secondary w-100">Filter Results</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Product Details</th>
+                        <th>SKU</th>
+                        <th>Warehouse</th>
+                        <th class="text-center">Current Stock</th>
+                        <th>Last Updated</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (productStocks != null)
+                    {
+                        @foreach (var stock in productStocks)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary text-white rounded-2 p-2 me-3" style="width: 40px; height: 40px; text-align: center;"> @stock.ProductName[0] </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold"> @stock.ProductName</h6>
+                                            <small class="text-muted">@stock.CategoryName</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border"> @stock.Sku</span></td>
+                                <td>@stock.WarehouseName</td>
+                                <td class="text-center">
+                                    <span class="badge fs-6 fw-medium px-3
+                                        @(stock.Quantity <= 0 ? "bg-danger text-white" :
+                                                    stock.Quantity <= 10 ? "bg-danger-subtle text-danger" :
+                                                    stock.Quantity <= 50 ? "bg-warning-subtle text-dark" :
+                                                    "bg-success-subtle text-success")">
+        
+                                        @stock.Quantity Units
+
+                                        @if (stock.Quantity <= 10 && stock.Quantity > 0)
+                                        {
+                                            <i class="bi bi-exclamation-triangle-fill ms-1" title="Low Stock!"></i>
+                                        }
+                                        else if (stock.Quantity <= 0)
+                                        {
+                                            <i class="bi bi-x-circle-fill ms-1" title="Out of Stock!"></i>
+                                        }
+                                    </span>
+                                </td>
+                                <td class="text-muted small">@stock.LastUpdated.ToLongDateString()</td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-outline-info" title="View History">
+                                        <i class="bi bi-clock-history"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                        }
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@code 
+{
+    [Inject] public HttpClient? Http { get; set; }
+    private string ? searchTerm  = null;
+    private int ? selectedWarehouseId = null;
+    private IEnumerable<WarehouseDTO>? warehouses;
+    private IEnumerable<ProductStockDto>? productStocks;  
+    private CreateUpdateProductStockDto MovementModel { get; set; } = new CreateUpdateProductStockDto();
+    protected override async Task OnInitializedAsync()
+    {
+        warehouses = await Http!.GetFromJsonAsync<IEnumerable<WarehouseDTO>>($"{UrlsPath.BaseUrl}{UrlsPath.Warehouses}/lookUp");
+    }
+    private async Task LoadData()
+    {
+        var query = !string.IsNullOrEmpty(searchTerm) ? $"?searchTerm={searchTerm}" : "";
+        query += string.IsNullOrEmpty(query) ? "?" : "&";
+        var selectedWarehouseIdQuery = selectedWarehouseId == null ? null : selectedWarehouseId; ;
+        query += $"warehouseId={selectedWarehouseIdQuery}";
+        productStocks  = await Http!.GetFromJsonAsync<IEnumerable<ProductStockDto>>($"{UrlsPath.BaseUrl}{UrlsPath.ProductStock}{query}");
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData  (); 
+    }
+    private async Task ApplyFilter()
+    {
+        await LoadData();
+    }
+    // -*
+    public bool IsVisible { get; set; } = false;
+
+    public void Show() => IsVisible = true;
+    public void Close() => IsVisible = false;
+    bool isTransfer = false;
+
+    
+    private void HandleValidSubmit(EditContext args)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+

@@ -6,6 +6,7 @@
         public const string Products = "products";
         public const string Categories = "categories";
         public const string Warehouses = "warehouses"; 
+        public const string ProductStock = "productstock";    
         public const string Host = "https://localhost:7120";
     }
 }
